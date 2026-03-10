@@ -4,6 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * BookingSystem — Facade Pattern
+ *
+ * This class acts as the single entry point for all system operations.
+ * The console menu (Main.java) interacts only with BookingSystem,
+ * which internally coordinates Member, Lesson, Booking, Review,
+ * and Timetable — hiding all complexity from the UI layer.
  *
  * @author Mavi
  */
@@ -55,8 +61,8 @@ public class BookingSystem {
             if (existing.getMember().equals(member)) {
                 Lesson booked = existing.getLesson();
                 if (booked.getWeekendNumber() == newLesson.getWeekendNumber()
-                        && booked.getDay().equalsIgnoreCase(newLesson.getDay())
-                        && booked.getTimeSlot().equalsIgnoreCase(newLesson.getTimeSlot())) {
+                        && booked.getDay() == newLesson.getDay()
+                        && booked.getTimeSlot() == newLesson.getTimeSlot()) {
                     return true;
                 }
             }
@@ -135,7 +141,7 @@ public class BookingSystem {
 
     // ── TIMETABLE VIEWS ───────────────────────────────────────────────────────
 
-    public void viewTimetableByDay(String day) {
+    public void viewTimetableByDay(Day day) {
         System.out.println("\n── Timetable for " + day + " ──");
         List<Lesson> lessons = timetable.getLessonsByDay(day);
         if (lessons.isEmpty()) {
@@ -226,7 +232,7 @@ public class BookingSystem {
             }
         }
 
-        System.out.println("\n🏆 Highest income: " + topExercise
+        System.out.println("\nHighest income: " + topExercise
                 + " (£" + String.format("%.2f", topIncome) + ")");
     }
 

@@ -3,20 +3,16 @@ package com.furzefield;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author Mavi
- */
 public class Lesson {
-    private final LessonType lessonType;
-    private final int weekendNumber;
-    private final String day;
-    private final String timeSlot;
-    private final List<Booking> bookings;
+    private LessonType lessonType;
+    private int weekendNumber;
+    private Day day;
+    private TimeSlot timeSlot;
+    private List<Booking> bookings;
 
     public static final int MAX_CAPACITY = 4;
 
-    public Lesson(LessonType lessonType, int weekendNumber, String day, String timeSlot) {
+    public Lesson(LessonType lessonType, int weekendNumber, Day day, TimeSlot timeSlot) {
         this.lessonType = lessonType;
         this.weekendNumber = weekendNumber;
         this.day = day;
@@ -26,8 +22,8 @@ public class Lesson {
 
     public LessonType getLessonType() { return lessonType; }
     public int getWeekendNumber() { return weekendNumber; }
-    public String getDay() { return day; }
-    public String getTimeSlot() { return timeSlot; }
+    public Day getDay() { return day; }
+    public TimeSlot getTimeSlot() { return timeSlot; }
     public List<Booking> getBookings() { return bookings; }
 
     public boolean isFull() {

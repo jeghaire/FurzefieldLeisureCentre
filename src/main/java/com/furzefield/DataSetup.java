@@ -33,49 +33,37 @@ public class DataSetup {
     public static Timetable createTimetable(List<LessonType> types) {
         Timetable timetable = new Timetable();
 
-        // Convenience variables
-        LessonType yoga     = types.get(0);
-        LessonType zumba    = types.get(1);
-        LessonType aquacise = types.get(2);
-        LessonType boxFit   = types.get(3);
+        LessonType yoga      = types.get(0);
+        LessonType zumba     = types.get(1);
+        LessonType aquacise  = types.get(2);
+        LessonType boxFit    = types.get(3);
         LessonType bodyBlitz = types.get(4);
 
-        String[] days  = {"Saturday", "Sunday"};
-        String[] slots = {"Morning", "Afternoon", "Evening"};
-
-        // 8 weekends × 2 days × 3 slots = 48 lessons
-        // Each day: Morning, Afternoon, Evening rotate through the 5 lesson types
-
         LessonType[][] schedule = {
-                // Weekend 1
-                {yoga, zumba, aquacise},       // Saturday
-                {boxFit, bodyBlitz, yoga},     // Sunday
-                // Weekend 2
-                {zumba, aquacise, boxFit},     // Saturday
-                {bodyBlitz, yoga, zumba},      // Sunday
-                // Weekend 3
-                {aquacise, boxFit, bodyBlitz}, // Saturday
-                {yoga, zumba, aquacise},       // Sunday
-                // Weekend 4
-                {boxFit, bodyBlitz, yoga},     // Saturday
-                {zumba, aquacise, boxFit},     // Sunday
-                // Weekend 5
-                {bodyBlitz, yoga, zumba},      // Saturday
-                {aquacise, boxFit, bodyBlitz}, // Sunday
-                // Weekend 6
-                {yoga, zumba, aquacise},       // Saturday
-                {boxFit, bodyBlitz, yoga},     // Sunday
-                // Weekend 7
-                {zumba, aquacise, boxFit},     // Saturday
-                {bodyBlitz, yoga, zumba},      // Sunday
-                // Weekend 8
-                {aquacise, boxFit, bodyBlitz}, // Saturday
-                {yoga, zumba, aquacise},       // Sunday
+                {yoga, zumba, aquacise},
+                {boxFit, bodyBlitz, yoga},
+                {zumba, aquacise, boxFit},
+                {bodyBlitz, yoga, zumba},
+                {aquacise, boxFit, bodyBlitz},
+                {yoga, zumba, aquacise},
+                {boxFit, bodyBlitz, yoga},
+                {zumba, aquacise, boxFit},
+                {bodyBlitz, yoga, zumba},
+                {aquacise, boxFit, bodyBlitz},
+                {yoga, zumba, aquacise},
+                {boxFit, bodyBlitz, yoga},
+                {zumba, aquacise, boxFit},
+                {bodyBlitz, yoga, zumba},
+                {aquacise, boxFit, bodyBlitz},
+                {yoga, zumba, aquacise},
         };
+
+        Day[] days = {Day.SATURDAY, Day.SUNDAY};
+        TimeSlot[] slots = {TimeSlot.MORNING, TimeSlot.AFTERNOON, TimeSlot.EVENING};
 
         int scheduleIndex = 0;
         for (int weekend = 1; weekend <= 8; weekend++) {
-            for (String day : days) {
+            for (Day day : days) {
                 LessonType[] daySchedule = schedule[scheduleIndex++];
                 for (int s = 0; s < slots.length; s++) {
                     timetable.addLesson(new Lesson(daySchedule[s], weekend, day, slots[s]));

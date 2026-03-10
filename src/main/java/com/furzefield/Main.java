@@ -74,7 +74,7 @@ public class Main {
         System.out.println("1. Saturday");
         System.out.println("2. Sunday");
         int choice = readInt("Select day: ");
-        String day = (choice == 1) ? "Saturday" : "Sunday";
+        Day day = (choice == 1) ? Day.SATURDAY : Day.SUNDAY;
         bookingSystem.viewTimetableByDay(day);
     }
 
@@ -181,8 +181,8 @@ public class Main {
         if (choice == 1) {
             System.out.println("1. Saturday  2. Sunday");
             int day = readInt("Select: ");
-            String dayName = (day == 1) ? "Saturday" : "Sunday";
-            lessons = bookingSystem.getTimetable().getLessonsByDay(dayName);
+            Day dayEnum = (day == 1) ? Day.SATURDAY : Day.SUNDAY;
+            lessons = bookingSystem.getTimetable().getLessonsByDay(dayEnum);
         } else {
             System.out.print("Enter exercise name: ");
             String name = scanner.nextLine().trim();

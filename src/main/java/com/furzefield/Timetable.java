@@ -23,10 +23,10 @@ public class Timetable {
     }
 
     // Search by day (Saturday or Sunday)
-    public List<Lesson> getLessonsByDay(String day) {
+    public List<Lesson> getLessonsByDay(Day day) {
         List<Lesson> result = new ArrayList<>();
         for (Lesson l : lessons) {
-            if (l.getDay().equalsIgnoreCase(day)) {
+            if (l.getDay() == day) {
                 result.add(l);
             }
         }
