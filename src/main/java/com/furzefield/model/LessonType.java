@@ -1,4 +1,4 @@
-package com.furzefield;
+package com.furzefield.model;
 
 /**
  *

@@ -1,4 +1,7 @@
-package com.furzefield;
+package com.furzefield.model;
+
+import com.furzefield.enums.Day;
+import com.furzefield.enums.TimeSlot;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,12 @@
-package com.furzefield;
+package com.furzefield.data;
+
+import com.furzefield.enums.Day;
+import com.furzefield.enums.TimeSlot;
+import com.furzefield.model.Lesson;
+import com.furzefield.model.LessonType;
+import com.furzefield.model.Member;
+import com.furzefield.service.BookingSystem;
+import com.furzefield.service.Timetable;
 
 import java.util.ArrayList;
 import java.util.List;

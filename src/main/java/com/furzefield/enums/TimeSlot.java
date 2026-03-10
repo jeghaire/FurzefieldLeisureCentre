@@ -1,4 +1,4 @@
-package com.furzefield;
+package com.furzefield.enums;
 
 public enum TimeSlot {
     MORNING("Morning"),

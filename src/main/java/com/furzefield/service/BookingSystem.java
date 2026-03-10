@@ -1,4 +1,10 @@
-package com.furzefield;
+package com.furzefield.service;
+
+import com.furzefield.model.Booking;
+import com.furzefield.model.Lesson;
+import com.furzefield.model.Member;
+import com.furzefield.model.Review;
+import com.furzefield.enums.Day;
 
 import java.util.ArrayList;
 import java.util.List;

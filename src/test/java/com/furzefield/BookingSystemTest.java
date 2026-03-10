@@ -1,5 +1,11 @@
 package com.furzefield;
 
+import com.furzefield.data.DataSetup;
+import com.furzefield.model.Lesson;
+import com.furzefield.model.LessonType;
+import com.furzefield.model.Member;
+import com.furzefield.service.BookingSystem;
+import com.furzefield.service.Timetable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;
