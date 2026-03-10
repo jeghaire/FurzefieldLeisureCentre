@@ -19,6 +19,10 @@ public class Main {
         Timetable timetable = DataSetup.createTimetable(lessonTypes);
         bookingSystem = new BookingSystem(timetable, members);
 
+        // Seed bookings and reviews
+        DataSetup.createSeedBookings(bookingSystem, members, timetable);
+        DataSetup.createSeedReviews(bookingSystem, members, timetable);
+
         System.out.println("========================================");
         System.out.println("Furzefield Leisure Centre System");
         System.out.println("========================================");

@@ -85,4 +85,77 @@ public class DataSetup {
 
         return timetable;
     }
+
+    public static void createSeedBookings(BookingSystem bookingSystem,
+                                          List<Member> members,
+                                          Timetable timetable) {
+        List<Lesson> lessons = timetable.getAllLessons();
+
+        // Weekend 1 - Saturday Morning (Yoga) - lesson index 0
+        bookingSystem.bookLesson(members.get(0), lessons.get(0));  // Alice - Yoga
+        bookingSystem.bookLesson(members.get(1), lessons.get(0));  // Bob - Yoga
+        bookingSystem.bookLesson(members.get(2), lessons.get(0));  // Carol - Yoga
+
+        // Weekend 1 - Saturday Afternoon (Zumba) - lesson index 1
+        bookingSystem.bookLesson(members.get(3), lessons.get(1));  // David - Zumba
+        bookingSystem.bookLesson(members.get(4), lessons.get(1));  // Emma - Zumba
+
+        // Weekend 1 - Saturday Evening (Aquacise) - lesson index 2
+        bookingSystem.bookLesson(members.get(5), lessons.get(2));  // Frank - Aquacise
+        bookingSystem.bookLesson(members.get(6), lessons.get(2));  // Grace - Aquacise
+        bookingSystem.bookLesson(members.get(7), lessons.get(2));  // Harry - Aquacise
+
+        // Weekend 1 - Sunday Morning (Box Fit) - lesson index 3
+        bookingSystem.bookLesson(members.get(8), lessons.get(3));  // Isla - Box Fit
+        bookingSystem.bookLesson(members.get(9), lessons.get(3));  // Jack - Box Fit
+        bookingSystem.bookLesson(members.get(0), lessons.get(3));  // Alice - Box Fit
+
+        // Weekend 1 - Sunday Afternoon (Body Blitz) - lesson index 4
+        bookingSystem.bookLesson(members.get(1), lessons.get(4));  // Bob - Body Blitz
+        bookingSystem.bookLesson(members.get(2), lessons.get(4));  // Carol - Body Blitz
+
+        // Weekend 2 - Saturday Morning (Zumba) - lesson index 6
+        bookingSystem.bookLesson(members.get(3), lessons.get(6));  // David - Zumba
+        bookingSystem.bookLesson(members.get(4), lessons.get(6));  // Emma - Zumba
+        bookingSystem.bookLesson(members.get(5), lessons.get(6));  // Frank - Zumba
+        bookingSystem.bookLesson(members.get(6), lessons.get(6));  // Grace - Zumba
+
+        // Weekend 2 - Saturday Afternoon (Aquacise) - lesson index 7
+        bookingSystem.bookLesson(members.get(7), lessons.get(7));  // Harry - Aquacise
+        bookingSystem.bookLesson(members.get(8), lessons.get(7));  // Isla - Aquacise
+
+        // Weekend 2 - Sunday Morning (Body Blitz) - lesson index 9
+        bookingSystem.bookLesson(members.get(9), lessons.get(9));  // Jack - Body Blitz
+        bookingSystem.bookLesson(members.get(0), lessons.get(9));  // Alice - Body Blitz
+        bookingSystem.bookLesson(members.get(1), lessons.get(9));  // Bob - Body Blitz
+    }
+
+    public static void createSeedReviews(BookingSystem bookingSystem,
+                                         List<Member> members,
+                                         Timetable timetable) {
+        List<Lesson> lessons = timetable.getAllLessons();
+
+        // At least 20 reviews required
+        bookingSystem.submitReview(members.get(0), lessons.get(0), 5, "Amazing Yoga session!");
+        bookingSystem.submitReview(members.get(1), lessons.get(0), 4, "Really enjoyed it.");
+        bookingSystem.submitReview(members.get(2), lessons.get(0), 3, "It was okay.");
+        bookingSystem.submitReview(members.get(3), lessons.get(1), 5, "Best Zumba ever!");
+        bookingSystem.submitReview(members.get(4), lessons.get(1), 4, "Great energy in class.");
+        bookingSystem.submitReview(members.get(5), lessons.get(2), 2, "Too slow for me.");
+        bookingSystem.submitReview(members.get(6), lessons.get(2), 4, "Good workout.");
+        bookingSystem.submitReview(members.get(7), lessons.get(2), 5, "Loved the Aquacise class!");
+        bookingSystem.submitReview(members.get(8), lessons.get(3), 5, "Box Fit was intense!");
+        bookingSystem.submitReview(members.get(9), lessons.get(3), 4, "Really challenging, loved it.");
+        bookingSystem.submitReview(members.get(0), lessons.get(3), 3, "Good but very tough.");
+        bookingSystem.submitReview(members.get(1), lessons.get(4), 4, "Body Blitz was great.");
+        bookingSystem.submitReview(members.get(2), lessons.get(4), 5, "Fantastic class!");
+        bookingSystem.submitReview(members.get(3), lessons.get(6), 4, "Zumba is always fun.");
+        bookingSystem.submitReview(members.get(4), lessons.get(6), 5, "Instructor was brilliant.");
+        bookingSystem.submitReview(members.get(5), lessons.get(6), 3, "Decent session.");
+        bookingSystem.submitReview(members.get(6), lessons.get(6), 4, "Will come back.");
+        bookingSystem.submitReview(members.get(7), lessons.get(7), 2, "A bit too easy.");
+        bookingSystem.submitReview(members.get(8), lessons.get(7), 5, "Perfect pace for me.");
+        bookingSystem.submitReview(members.get(9), lessons.get(9), 4, "Body Blitz well structured.");
+        bookingSystem.submitReview(members.get(0), lessons.get(9), 5, "Incredible session!");
+    }
 }
