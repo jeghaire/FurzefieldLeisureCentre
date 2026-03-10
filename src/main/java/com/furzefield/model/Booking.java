@@ -18,7 +18,7 @@ public class Booking {
 
     @Override
     public String toString() {
-        return member.getName() + " booked " + lesson.getLessonType().getName()
+        return member.getName() + " booked " + lesson.getExerciseType().getDisplayName()
                 + " (" + lesson.getDay() + " " + lesson.getTimeSlot() + ")";
     }
 }

@@ -1,10 +1,9 @@
 package com.furzefield.data;
 
 import com.furzefield.enums.Day;
+import com.furzefield.enums.ExerciseType;
 import com.furzefield.enums.TimeSlot;
-import com.furzefield.model.Lesson;
-import com.furzefield.model.LessonType;
-import com.furzefield.model.Member;
+import com.furzefield.model.*;
 import com.furzefield.service.BookingSystem;
 import com.furzefield.service.Timetable;
 
@@ -28,57 +27,42 @@ public class DataSetup {
         return members;
     }
 
-    public static List<LessonType> createLessonTypes() {
-        List<LessonType> types = new ArrayList<>();
-        types.add(new LessonType("Yoga", 12.00));
-        types.add(new LessonType("Zumba", 10.00));
-        types.add(new LessonType("Aquacise", 8.00));
-        types.add(new LessonType("Box Fit", 15.00));
-        types.add(new LessonType("Body Blitz", 11.00));
-        return types;
-    }
-
-    public static Timetable createTimetable(List<LessonType> types) {
+    public static Timetable createTimetable() {
         Timetable timetable = new Timetable();
 
-        LessonType yoga      = types.get(0);
-        LessonType zumba     = types.get(1);
-        LessonType aquacise  = types.get(2);
-        LessonType boxFit    = types.get(3);
-        LessonType bodyBlitz = types.get(4);
-
-        LessonType[][] schedule = {
-                {yoga, zumba, aquacise},
-                {boxFit, bodyBlitz, yoga},
-                {zumba, aquacise, boxFit},
-                {bodyBlitz, yoga, zumba},
-                {aquacise, boxFit, bodyBlitz},
-                {yoga, zumba, aquacise},
-                {boxFit, bodyBlitz, yoga},
-                {zumba, aquacise, boxFit},
-                {bodyBlitz, yoga, zumba},
-                {aquacise, boxFit, bodyBlitz},
-                {yoga, zumba, aquacise},
-                {boxFit, bodyBlitz, yoga},
-                {zumba, aquacise, boxFit},
-                {bodyBlitz, yoga, zumba},
-                {aquacise, boxFit, bodyBlitz},
-                {yoga, zumba, aquacise},
+        ExerciseType[][] schedule = {
+                {ExerciseType.YOGA,       ExerciseType.ZUMBA,      ExerciseType.AQUACISE  },
+                {ExerciseType.BOX_FIT,    ExerciseType.BODY_BLITZ, ExerciseType.YOGA      },
+                {ExerciseType.ZUMBA,      ExerciseType.AQUACISE,   ExerciseType.BOX_FIT   },
+                {ExerciseType.BODY_BLITZ, ExerciseType.YOGA,       ExerciseType.ZUMBA     },
+                {ExerciseType.AQUACISE,   ExerciseType.BOX_FIT,    ExerciseType.BODY_BLITZ},
+                {ExerciseType.YOGA,       ExerciseType.ZUMBA,      ExerciseType.AQUACISE  },
+                {ExerciseType.BOX_FIT,    ExerciseType.BODY_BLITZ, ExerciseType.YOGA      },
+                {ExerciseType.ZUMBA,      ExerciseType.AQUACISE,   ExerciseType.BOX_FIT   },
+                {ExerciseType.BODY_BLITZ, ExerciseType.YOGA,       ExerciseType.ZUMBA     },
+                {ExerciseType.AQUACISE,   ExerciseType.BOX_FIT,    ExerciseType.BODY_BLITZ},
+                {ExerciseType.YOGA,       ExerciseType.ZUMBA,      ExerciseType.AQUACISE  },
+                {ExerciseType.BOX_FIT,    ExerciseType.BODY_BLITZ, ExerciseType.YOGA      },
+                {ExerciseType.ZUMBA,      ExerciseType.AQUACISE,   ExerciseType.BOX_FIT   },
+                {ExerciseType.BODY_BLITZ, ExerciseType.YOGA,       ExerciseType.ZUMBA     },
+                {ExerciseType.AQUACISE,   ExerciseType.BOX_FIT,    ExerciseType.BODY_BLITZ},
+                {ExerciseType.YOGA,       ExerciseType.ZUMBA,      ExerciseType.AQUACISE  },
         };
 
         Day[] days = {Day.SATURDAY, Day.SUNDAY};
         TimeSlot[] slots = {TimeSlot.MORNING, TimeSlot.AFTERNOON, TimeSlot.EVENING};
 
-        int scheduleIndex = 0;
+        int index = 0;
         for (int weekend = 1; weekend <= 8; weekend++) {
             for (Day day : days) {
-                LessonType[] daySchedule = schedule[scheduleIndex++];
+                ExerciseType[] daySchedule = schedule[index++];
                 for (int s = 0; s < slots.length; s++) {
-                    timetable.addLesson(new Lesson(daySchedule[s], weekend, day, slots[s]));
+                    timetable.addLesson(
+                            new Lesson(daySchedule[s], weekend, day, slots[s])
+                    );
                 }
             }
         }
-
         return timetable;
     }
 
@@ -87,43 +71,28 @@ public class DataSetup {
                                           Timetable timetable) {
         List<Lesson> lessons = timetable.getAllLessons();
 
-        // Weekend 1 - Saturday Morning (Yoga) - lesson index 0
-        bookingSystem.bookLesson(members.get(0), lessons.get(0));  // Alice - Yoga
-        bookingSystem.bookLesson(members.get(1), lessons.get(0));  // Bob - Yoga
-        bookingSystem.bookLesson(members.get(2), lessons.get(0));  // Carol - Yoga
-
-        // Weekend 1 - Saturday Afternoon (Zumba) - lesson index 1
-        bookingSystem.bookLesson(members.get(3), lessons.get(1));  // David - Zumba
-        bookingSystem.bookLesson(members.get(4), lessons.get(1));  // Emma - Zumba
-
-        // Weekend 1 - Saturday Evening (Aquacise) - lesson index 2
-        bookingSystem.bookLesson(members.get(5), lessons.get(2));  // Frank - Aquacise
-        bookingSystem.bookLesson(members.get(6), lessons.get(2));  // Grace - Aquacise
-        bookingSystem.bookLesson(members.get(7), lessons.get(2));  // Harry - Aquacise
-
-        // Weekend 1 - Sunday Morning (Box Fit) - lesson index 3
-        bookingSystem.bookLesson(members.get(8), lessons.get(3));  // Isla - Box Fit
-        bookingSystem.bookLesson(members.get(9), lessons.get(3));  // Jack - Box Fit
-        bookingSystem.bookLesson(members.get(0), lessons.get(3));  // Alice - Box Fit
-
-        // Weekend 1 - Sunday Afternoon (Body Blitz) - lesson index 4
-        bookingSystem.bookLesson(members.get(1), lessons.get(4));  // Bob - Body Blitz
-        bookingSystem.bookLesson(members.get(2), lessons.get(4));  // Carol - Body Blitz
-
-        // Weekend 2 - Saturday Morning (Zumba) - lesson index 6
-        bookingSystem.bookLesson(members.get(3), lessons.get(6));  // David - Zumba
-        bookingSystem.bookLesson(members.get(4), lessons.get(6));  // Emma - Zumba
-        bookingSystem.bookLesson(members.get(5), lessons.get(6));  // Frank - Zumba
-        bookingSystem.bookLesson(members.get(6), lessons.get(6));  // Grace - Zumba
-
-        // Weekend 2 - Saturday Afternoon (Aquacise) - lesson index 7
-        bookingSystem.bookLesson(members.get(7), lessons.get(7));  // Harry - Aquacise
-        bookingSystem.bookLesson(members.get(8), lessons.get(7));  // Isla - Aquacise
-
-        // Weekend 2 - Sunday Morning (Body Blitz) - lesson index 9
-        bookingSystem.bookLesson(members.get(9), lessons.get(9));  // Jack - Body Blitz
-        bookingSystem.bookLesson(members.get(0), lessons.get(9));  // Alice - Body Blitz
-        bookingSystem.bookLesson(members.get(1), lessons.get(9));  // Bob - Body Blitz
+        bookingSystem.bookLesson(members.get(0), lessons.get(0));
+        bookingSystem.bookLesson(members.get(1), lessons.get(0));
+        bookingSystem.bookLesson(members.get(2), lessons.get(0));
+        bookingSystem.bookLesson(members.get(3), lessons.get(1));
+        bookingSystem.bookLesson(members.get(4), lessons.get(1));
+        bookingSystem.bookLesson(members.get(5), lessons.get(2));
+        bookingSystem.bookLesson(members.get(6), lessons.get(2));
+        bookingSystem.bookLesson(members.get(7), lessons.get(2));
+        bookingSystem.bookLesson(members.get(8), lessons.get(3));
+        bookingSystem.bookLesson(members.get(9), lessons.get(3));
+        bookingSystem.bookLesson(members.get(0), lessons.get(3));
+        bookingSystem.bookLesson(members.get(1), lessons.get(4));
+        bookingSystem.bookLesson(members.get(2), lessons.get(4));
+        bookingSystem.bookLesson(members.get(3), lessons.get(6));
+        bookingSystem.bookLesson(members.get(4), lessons.get(6));
+        bookingSystem.bookLesson(members.get(5), lessons.get(6));
+        bookingSystem.bookLesson(members.get(6), lessons.get(6));
+        bookingSystem.bookLesson(members.get(7), lessons.get(7));
+        bookingSystem.bookLesson(members.get(8), lessons.get(7));
+        bookingSystem.bookLesson(members.get(9), lessons.get(9));
+        bookingSystem.bookLesson(members.get(0), lessons.get(9));
+        bookingSystem.bookLesson(members.get(1), lessons.get(9));
     }
 
     public static void createSeedReviews(BookingSystem bookingSystem,
@@ -131,7 +100,6 @@ public class DataSetup {
                                          Timetable timetable) {
         List<Lesson> lessons = timetable.getAllLessons();
 
-        // At least 20 reviews required
         bookingSystem.submitReview(members.get(0), lessons.get(0), 5, "Amazing Yoga session!");
         bookingSystem.submitReview(members.get(1), lessons.get(0), 4, "Really enjoyed it.");
         bookingSystem.submitReview(members.get(2), lessons.get(0), 3, "It was okay.");

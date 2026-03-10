@@ -40,7 +40,7 @@ public class Timetable {
     public List<Lesson> getLessonsByExercise(String exerciseName) {
         List<Lesson> result = new ArrayList<>();
         for (Lesson l : lessons) {
-            if (l.getLessonType().getName().equalsIgnoreCase(exerciseName)) {
+            if (l.getExerciseType().getDisplayName().equalsIgnoreCase(exerciseName)) {
                 result.add(l);
             }
         }

@@ -24,7 +24,7 @@ public class Review {
 
     @Override
     public String toString() {
-        return member.getName() + " rated " + lesson.getLessonType().getName()
+        return member.getName() + " rated " + lesson.getExerciseType().getDisplayName()
                 + " " + rating + "/5 - \"" + comment + "\"";
     }
 }

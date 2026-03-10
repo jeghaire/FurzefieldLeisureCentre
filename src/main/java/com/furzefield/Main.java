@@ -4,7 +4,6 @@ import com.furzefield.data.DataSetup;
 import com.furzefield.enums.Day;
 import com.furzefield.model.Booking;
 import com.furzefield.model.Lesson;
-import com.furzefield.model.LessonType;
 import com.furzefield.model.Member;
 import com.furzefield.service.BookingSystem;
 import com.furzefield.service.Timetable;
@@ -24,8 +23,7 @@ public class Main {
     static void main() {
         // Initialise all data
         members = DataSetup.createMembers();
-        List<LessonType> lessonTypes = DataSetup.createLessonTypes();
-        Timetable timetable = DataSetup.createTimetable(lessonTypes);
+        Timetable timetable = DataSetup.createTimetable();
         bookingSystem = new BookingSystem(timetable, members);
 
         // Seed bookings and reviews

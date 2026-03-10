@@ -2,7 +2,6 @@ package com.furzefield;
 
 import com.furzefield.data.DataSetup;
 import com.furzefield.model.Lesson;
-import com.furzefield.model.LessonType;
 import com.furzefield.model.Member;
 import com.furzefield.service.BookingSystem;
 import com.furzefield.service.Timetable;
@@ -16,13 +15,11 @@ public class BookingSystemTest {
     private BookingSystem bookingSystem;
     private List<Member> members;
     private Timetable timetable;
-    private List<LessonType> lessonTypes;
 
     @BeforeEach
     void setUp() {
         members = DataSetup.createMembers();
-        lessonTypes = DataSetup.createLessonTypes();
-        timetable = DataSetup.createTimetable(lessonTypes);
+        timetable = DataSetup.createTimetable();
         bookingSystem = new BookingSystem(timetable, members);
     }
 

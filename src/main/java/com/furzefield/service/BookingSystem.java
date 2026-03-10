@@ -37,7 +37,7 @@ public class BookingSystem {
     public boolean bookLesson(Member member, Lesson lesson) {
         // Check 1: is the lesson full?
         if (lesson.isFull()) {
-            System.out.println("Sorry, " + lesson.getLessonType().getName()
+            System.out.println("Sorry, " + lesson.getExerciseType().getDisplayName()
                     + " on " + lesson.getDay() + " " + lesson.getTimeSlot()
                     + " is full.");
             return false;
@@ -84,7 +84,7 @@ public class BookingSystem {
 
         if (existingBooking == null) {
             System.out.println("No booking found for " + member.getName()
-                    + " in " + oldLesson.getLessonType().getName()
+                    + " in " + oldLesson.getExerciseType().getDisplayName()
                     + " on " + oldLesson.getDay() + " " + oldLesson.getTimeSlot());
             return false;
         }
@@ -198,7 +198,7 @@ public class BookingSystem {
             System.out.println("Weekend " + lesson.getWeekendNumber()
                     + " | " + lesson.getDay()
                     + " " + lesson.getTimeSlot()
-                    + " | " + lesson.getLessonType().getName()
+                    + " | " + lesson.getExerciseType().getDisplayName()
                     + " | Members: " + memberCount
                     + " | Avg Rating: " + avgRating);
         }
@@ -214,7 +214,7 @@ public class BookingSystem {
         // Get all unique lesson type names
         List<String> exerciseNames = new ArrayList<>();
         for (Lesson l : timetable.getAllLessons()) {
-            String name = l.getLessonType().getName();
+            String name = l.getExerciseType().getDisplayName();
             if (!exerciseNames.contains(name)) {
                 exerciseNames.add(name);
             }
@@ -226,8 +226,8 @@ public class BookingSystem {
         for (String name : exerciseNames) {
             double income = 0;
             for (Lesson l : timetable.getAllLessons()) {
-                if (l.getLessonType().getName().equals(name)) {
-                    income += l.getBookings().size() * l.getLessonType().getPrice();
+                if (l.getExerciseType().getDisplayName().equals(name)) {
+                    income += l.getBookings().size() * l.getExerciseType().getPrice();
                 }
             }
             System.out.println(name + ": £" + String.format("%.2f", income));
