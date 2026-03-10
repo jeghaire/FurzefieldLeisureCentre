@@ -159,6 +159,77 @@ public class BookingSystem {
         }
     }
 
+    // ── REPORT 1: Members per lesson + average rating ─────────────────────────
+
+    public void printAttendanceReport() {
+        System.out.println("\n========================================");
+        System.out.println("  REPORT 1: Attendance & Ratings");
+        System.out.println("========================================");
+
+        for (Lesson lesson : timetable.getAllLessons()) {
+            int memberCount = lesson.getBookings().size();
+
+            // Calculate average rating for this lesson
+            double total = 0;
+            int reviewCount = 0;
+            for (Review r : allReviews) {
+                if (r.getLesson().equals(lesson)) {
+                    total += r.getRating();
+                    reviewCount++;
+                }
+            }
+
+            String avgRating = (reviewCount > 0)
+                    ? String.format("%.1f", total / reviewCount)
+                    : "No reviews";
+
+            System.out.println("Weekend " + lesson.getWeekendNumber()
+                    + " | " + lesson.getDay()
+                    + " " + lesson.getTimeSlot()
+                    + " | " + lesson.getLessonType().getName()
+                    + " | Members: " + memberCount
+                    + " | Avg Rating: " + avgRating);
+        }
+    }
+
+    // ── REPORT 2: Highest income exercise type ────────────────────────────────
+
+    public void printIncomeReport() {
+        System.out.println("\n========================================");
+        System.out.println("  REPORT 2: Income by Exercise Type");
+        System.out.println("========================================");
+
+        // Get all unique lesson type names
+        List<String> exerciseNames = new ArrayList<>();
+        for (Lesson l : timetable.getAllLessons()) {
+            String name = l.getLessonType().getName();
+            if (!exerciseNames.contains(name)) {
+                exerciseNames.add(name);
+            }
+        }
+
+        String topExercise = "";
+        double topIncome = 0;
+
+        for (String name : exerciseNames) {
+            double income = 0;
+            for (Lesson l : timetable.getAllLessons()) {
+                if (l.getLessonType().getName().equals(name)) {
+                    income += l.getBookings().size() * l.getLessonType().getPrice();
+                }
+            }
+            System.out.println(name + ": £" + String.format("%.2f", income));
+
+            if (income > topIncome) {
+                topIncome = income;
+                topExercise = name;
+            }
+        }
+
+        System.out.println("\n🏆 Highest income: " + topExercise
+                + " (£" + String.format("%.2f", topIncome) + ")");
+    }
+
     // ── HELPERS ───────────────────────────────────────────────────────────────
 
     public Booking findBooking(Member member, Lesson lesson) {
@@ -170,8 +241,19 @@ public class BookingSystem {
         return null;
     }
 
-    public List<Booking> getAllBookings() { return allBookings; }
-    public List<Review> getAllReviews() { return allReviews; }
-    public Timetable getTimetable() { return timetable; }
-    public List<Member> getMembers() { return members; }
+    public List<Booking> getAllBookings() {
+        return allBookings;
+    }
+
+    public List<Review> getAllReviews() {
+        return allReviews;
+    }
+
+    public Timetable getTimetable() {
+        return timetable;
+    }
+
+    public List<Member> getMembers() {
+        return members;
+    }
 }

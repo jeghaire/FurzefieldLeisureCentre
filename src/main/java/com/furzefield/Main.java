@@ -35,6 +35,8 @@ public class Main {
                 case 5 -> cancelBooking();
                 case 6 -> submitReview();
                 case 7 -> viewAllBookings();
+                case 8 -> bookingSystem.printAttendanceReport();
+                case 9 -> bookingSystem.printIncomeReport();
                 case 0 -> running = false;
                 default -> System.out.println("Invalid choice. Try again.");
             }
@@ -56,6 +58,8 @@ public class Main {
         System.out.println("  5. Cancel a booking");
         System.out.println("  6. Submit a review");
         System.out.println("  7. View all bookings");
+        System.out.println("  8. Report: Attendance & Ratings");
+        System.out.println("  9. Report: Income by Exercise");
         System.out.println("  0. Exit");
         System.out.println("──────────────────────────────────────");
     }
