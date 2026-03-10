@@ -25,11 +25,26 @@ public class BookingSystem {
     private final List<Booking> allBookings;
     private final List<Review> allReviews;
 
-    public BookingSystem(Timetable timetable, List<Member> members) {
-        this.timetable = timetable;
-        this.members = members;
-        this.allBookings = new ArrayList<>();
-        this.allReviews = new ArrayList<>();
+    // ── Singleton ─────────────────────────────────────────────────────────────────
+    private static BookingSystem instance;
+
+    private BookingSystem(Timetable timetable, List<Member> members) {
+        this.timetable    = timetable;
+        this.members      = members;
+        this.allBookings  = new ArrayList<>();
+        this.allReviews   = new ArrayList<>();
+    }
+
+    public static BookingSystem getInstance(Timetable timetable, List<Member> members) {
+        if (instance == null) {
+            instance = new BookingSystem(timetable, members);
+        }
+        return instance;
+    }
+
+    /** Used in JUnit tests to reset state between tests. */
+    public static void resetInstance() {
+        instance = null;
     }
 
     // ── BOOKING ──────────────────────────────────────────────────────────────

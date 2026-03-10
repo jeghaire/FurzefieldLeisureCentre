@@ -18,9 +18,10 @@ public class BookingSystemTest {
 
     @BeforeEach
     void setUp() {
+        BookingSystem.resetInstance();
         members = DataSetup.createMembers();
         timetable = DataSetup.createTimetable();
-        bookingSystem = new BookingSystem(timetable, members);
+        bookingSystem = BookingSystem.getInstance(timetable, members);
     }
 
     // ── TEST 1: Successful booking ────────────────────────────────────────────

@@ -24,7 +24,7 @@ public class Main {
         // Initialise all data
         members = DataSetup.createMembers();
         Timetable timetable = DataSetup.createTimetable();
-        bookingSystem = new BookingSystem(timetable, members);
+        bookingSystem = BookingSystem.getInstance(timetable, members);
 
         // Seed bookings and reviews
         DataSetup.createSeedBookings(bookingSystem, members, timetable);
