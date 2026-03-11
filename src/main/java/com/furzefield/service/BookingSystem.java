@@ -202,7 +202,7 @@ public class BookingSystem {
 
     // ── HELPERS ───────────────────────────────────────────────────────────────
 
-    public Booking findBooking(Member member, Lesson lesson) {
+    private Booking findBooking(Member member, Lesson lesson) {
         for (Booking b : allBookings) {
             if (b.member().equals(member) && b.lesson().equals(lesson)) {
                 return b;
@@ -234,6 +234,6 @@ public class BookingSystem {
     }
 
     public List<Member> getMembers() {
-        return members;
+        return new ArrayList<>(members);
     }
 }

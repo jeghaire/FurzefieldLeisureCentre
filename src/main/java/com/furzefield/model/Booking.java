@@ -8,6 +8,6 @@ public record Booking(Member member, Lesson lesson) {
     @Override
     public String toString() {
         return member.getName() + " booked " + lesson.getExerciseType().getDisplayName()
-                + " (" + lesson.getDay() + " " + lesson.getTimeSlot() + ")";
+                + " (" + lesson.getLessonId() + " | " + lesson.getDay() + " " + lesson.getTimeSlot() + ")";
     }
 }
