@@ -160,8 +160,8 @@ public class BookingSystem {
             double total = 0;
             int reviewCount = 0;
             for (Review r : allReviews) {
-                if (r.getLesson().equals(lesson)) {
-                    total += r.getRating();
+                if (r.lesson().equals(lesson)) {
+                    total += r.rating();
                     reviewCount++;
                 }
             }
@@ -221,7 +221,7 @@ public class BookingSystem {
 
     public Booking findBooking(Member member, Lesson lesson) {
         for (Booking b : allBookings) {
-            if (b.getMember().equals(member) && b.getLesson().equals(lesson)) {
+            if (b.member().equals(member) && b.lesson().equals(lesson)) {
                 return b;
             }
         }

@@ -39,7 +39,7 @@ public class Member {
      */
     public boolean hasTimeConflict(Day day, TimeSlot timeSlot, int weekendNumber) {
         for (Booking b : bookings) {
-            Lesson lesson = b.getLesson();
+            Lesson lesson = b.lesson();
             if (lesson.getWeekendNumber() == weekendNumber
                     && lesson.getDay() == day
                     && lesson.getTimeSlot() == timeSlot) {

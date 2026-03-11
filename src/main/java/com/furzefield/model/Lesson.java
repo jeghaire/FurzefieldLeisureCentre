@@ -54,7 +54,7 @@ public class Lesson {
     public double getAverageRating() {
         if (reviews.isEmpty()) return 0.0;
         return reviews.stream()
-                .mapToInt(Review::getRating)
+                .mapToInt(Review::rating)
                 .average()
                 .orElse(0.0);
     }

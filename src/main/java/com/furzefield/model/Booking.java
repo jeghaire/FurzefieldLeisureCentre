@@ -4,18 +4,7 @@ package com.furzefield.model;
  *
  * @author Mavi
  */
-public class Booking {
-    private final Member member;
-    private final Lesson lesson;
-
-    public Booking(Member member, Lesson lesson) {
-        this.member = member;
-        this.lesson = lesson;
-    }
-
-    public Member getMember() { return member; }
-    public Lesson getLesson() { return lesson; }
-
+public record Booking(Member member, Lesson lesson) {
     @Override
     public String toString() {
         return member.getName() + " booked " + lesson.getExerciseType().getDisplayName()
