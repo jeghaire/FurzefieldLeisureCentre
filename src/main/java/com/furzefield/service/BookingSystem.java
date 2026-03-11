@@ -50,7 +50,6 @@ public class BookingSystem {
     // ── BOOKING ──────────────────────────────────────────────────────────────
 
     public boolean bookLesson(Member member, Lesson lesson) {
-        // Check 1: is the lesson full?
         if (lesson.isFull()) {
             System.out.println("Sorry, " + lesson.getExerciseType().getDisplayName()
                     + " on " + lesson.getDay() + " " + lesson.getTimeSlot()
@@ -58,8 +57,7 @@ public class BookingSystem {
             return false;
         }
 
-        // Check 2: does the member already have a booking at this time?
-        if (hasTimeConflict(member, lesson)) {
+        if (member.hasTimeConflict(lesson.getDay(), lesson.getTimeSlot(), lesson.getWeekendNumber())) {
             System.out.println("Sorry, " + member.getName()
                     + " already has a booking on " + lesson.getDay()
                     + " " + lesson.getTimeSlot()
@@ -67,53 +65,33 @@ public class BookingSystem {
             return false;
         }
 
-        // All checks passed — create the booking
         Booking booking = new Booking(member, lesson);
         lesson.addBooking(booking);
+        member.addBooking(booking);
         allBookings.add(booking);
         System.out.println("Booked: " + booking);
         return true;
     }
 
-    // ── TIME CONFLICT CHECK ───────────────────────────────────────────────────
-
-    private boolean hasTimeConflict(Member member, Lesson newLesson) {
-        for (Booking existing : allBookings) {
-            if (existing.getMember().equals(member)) {
-                Lesson booked = existing.getLesson();
-                if (booked.getWeekendNumber() == newLesson.getWeekendNumber()
-                        && booked.getDay() == newLesson.getDay()
-                        && booked.getTimeSlot() == newLesson.getTimeSlot()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     // ── CHANGE BOOKING ────────────────────────────────────────────────────────
 
     public boolean changeBooking(Member member, Lesson oldLesson, Lesson newLesson) {
-        // Find the existing booking
         Booking existingBooking = findBooking(member, oldLesson);
 
         if (existingBooking == null) {
-            System.out.println("No booking found for " + member.getName()
-                    + " in " + oldLesson.getExerciseType().getDisplayName()
-                    + " on " + oldLesson.getDay() + " " + oldLesson.getTimeSlot());
+            System.out.println("No booking found for " + member.getName());
             return false;
         }
 
-        // Temporarily remove the old booking so conflict check works correctly
         oldLesson.removeBooking(existingBooking);
+        member.removeBooking(existingBooking);
         allBookings.remove(existingBooking);
 
-        // Try to book the new lesson
         boolean success = bookLesson(member, newLesson);
 
         if (!success) {
-            // New booking failed — restore the old one
             oldLesson.addBooking(existingBooking);
+            member.addBooking(existingBooking);
             allBookings.add(existingBooking);
             System.out.println("Change failed. Original booking restored.");
         } else {
@@ -134,6 +112,7 @@ public class BookingSystem {
         }
 
         lesson.removeBooking(booking);
+        member.removeBooking(booking);
         allBookings.remove(booking);
         System.out.println("Booking cancelled: " + booking);
         return true;
