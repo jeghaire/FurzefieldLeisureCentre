@@ -49,94 +49,88 @@ public class BookingSystem {
 
     // ── BOOKING ──────────────────────────────────────────────────────────────
 
-    public boolean bookLesson(Member member, Lesson lesson) {
+    public Booking bookLesson(Member member, Lesson lesson) {
         if (lesson.isFull()) {
-            System.out.println("Sorry, " + lesson.getExerciseType().getDisplayName()
-                    + " on " + lesson.getDay() + " " + lesson.getTimeSlot()
-                    + " is full.");
-            return false;
+            throw new IllegalStateException(
+                    "Lesson is full: " + lesson.getExerciseType().getDisplayName()
+                            + " on " + lesson.getDay() + " " + lesson.getTimeSlot()
+                            + " (Weekend " + lesson.getWeekendNumber() + ").");
         }
-
         if (member.hasTimeConflict(lesson.getDay(), lesson.getTimeSlot(), lesson.getWeekendNumber())) {
-            System.out.println("Sorry, " + member.getName()
-                    + " already has a booking on " + lesson.getDay()
-                    + " " + lesson.getTimeSlot()
-                    + " (Weekend " + lesson.getWeekendNumber() + ").");
-            return false;
+            throw new IllegalStateException(
+                    member.getName() + " already has a booking at this time: "
+                            + lesson.getDay() + " " + lesson.getTimeSlot()
+                            + " (Weekend " + lesson.getWeekendNumber() + ").");
         }
 
         Booking booking = new Booking(member, lesson);
         lesson.addBooking(booking);
         member.addBooking(booking);
         allBookings.add(booking);
-        System.out.println("Booked: " + booking);
-        return true;
+        return booking;
     }
 
     // ── CHANGE BOOKING ────────────────────────────────────────────────────────
 
-    public boolean changeBooking(Member member, Lesson oldLesson, Lesson newLesson) {
+    public Booking changeBooking(Member member, Lesson oldLesson, Lesson newLesson) {
         Booking existingBooking = findBooking(member, oldLesson);
 
         if (existingBooking == null) {
-            System.out.println("No booking found for " + member.getName());
-            return false;
+            throw new IllegalArgumentException(
+                    "No booking found for " + member.getName()
+                            + " in " + oldLesson.getExerciseType().getDisplayName());
         }
 
+        // Temporarily remove old booking so conflict check works correctly
         oldLesson.removeBooking(existingBooking);
         member.removeBooking(existingBooking);
         allBookings.remove(existingBooking);
 
-        boolean success = bookLesson(member, newLesson);
-
-        if (!success) {
+        try {
+            Booking newBooking = bookLesson(member, newLesson);
+            return newBooking;
+        } catch (IllegalStateException e) {
+            // Rollback
             oldLesson.addBooking(existingBooking);
             member.addBooking(existingBooking);
             allBookings.add(existingBooking);
-            System.out.println("Change failed. Original booking restored.");
-        } else {
-            System.out.println("Booking changed successfully for " + member.getName());
+            throw new IllegalStateException("Change failed — original booking restored. Reason: " + e.getMessage());
         }
-
-        return success;
     }
 
     // ── CANCEL BOOKING ────────────────────────────────────────────────────────
 
-    public boolean cancelBooking(Member member, Lesson lesson) {
+    public void cancelBooking(Member member, Lesson lesson) {
         Booking booking = findBooking(member, lesson);
 
         if (booking == null) {
-            System.out.println("No booking found to cancel.");
-            return false;
+            throw new IllegalArgumentException(
+                    "No booking found for " + member.getName()
+                            + " in " + lesson.getExerciseType().getDisplayName());
         }
 
         lesson.removeBooking(booking);
         member.removeBooking(booking);
         allBookings.remove(booking);
-        System.out.println("Booking cancelled: " + booking);
-        return true;
     }
 
     // ── REVIEWS ───────────────────────────────────────────────────────────────
 
-    public boolean submitReview(Member member, Lesson lesson, int rating, String comment) {
+    public Review submitReview(Member member, Lesson lesson, int rating, String comment) {
         if (rating < 1 || rating > 5) {
-            System.out.println("Rating must be between 1 and 5.");
-            return false;
+            throw new IllegalArgumentException("Rating must be between 1 and 5, got: " + rating);
         }
 
         // Check the member actually booked this lesson
         if (findBooking(member, lesson) == null) {
-            System.out.println(member.getName()
-                    + " has no booking for this lesson and cannot review it.");
-            return false;
+            throw new IllegalStateException(
+                    member.getName() + " has no booking for this lesson and cannot review it.");
         }
 
         Review review = new Review(member, lesson, rating, comment);
         allReviews.add(review);
-        System.out.println("Review submitted: " + review);
-        return true;
+        lesson.addReview(review);
+        return review;
     }
 
     // ── TIMETABLE VIEWS ───────────────────────────────────────────────────────

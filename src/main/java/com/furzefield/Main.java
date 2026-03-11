@@ -5,6 +5,7 @@ import com.furzefield.enums.Day;
 import com.furzefield.model.Booking;
 import com.furzefield.model.Lesson;
 import com.furzefield.model.Member;
+import com.furzefield.model.Review;
 import com.furzefield.service.BookingSystem;
 import com.furzefield.service.Timetable;
 
@@ -102,7 +103,12 @@ public class Main {
         Lesson lesson = selectLesson();
         if (lesson == null) return;
 
-        bookingSystem.bookLesson(member, lesson);
+        try {
+            Booking booking = bookingSystem.bookLesson(member, lesson);
+            System.out.println("Booked: " + booking);
+        } catch (IllegalStateException e) {
+            System.out.println("Booking failed: " + e.getMessage());
+        }
     }
 
     // ── OPTION 4: Change a booking ────────────────────────────────────────────
@@ -119,7 +125,12 @@ public class Main {
         Lesson newLesson = selectLesson();
         if (newLesson == null) return;
 
-        bookingSystem.changeBooking(member, oldLesson, newLesson);
+        try {
+            Booking newBooking = bookingSystem.changeBooking(member, oldLesson, newLesson);
+            System.out.println("Booking changed successfully: " + newBooking);
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            System.out.println("Change failed: " + e.getMessage());
+        }
     }
 
     // ── OPTION 5: Cancel a booking ────────────────────────────────────────────
@@ -131,7 +142,12 @@ public class Main {
         Lesson lesson = selectLesson();
         if (lesson == null) return;
 
-        bookingSystem.cancelBooking(member, lesson);
+        try {
+            bookingSystem.cancelBooking(member, lesson);
+            System.out.println("Booking cancelled successfully.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Cancel failed: " + e.getMessage());
+        }
     }
 
     // ── OPTION 6: Submit a review ─────────────────────────────────────────────
@@ -147,7 +163,12 @@ public class Main {
         System.out.print("Enter comment: ");
         String comment = scanner.nextLine().trim();
 
-        bookingSystem.submitReview(member, lesson, rating, comment);
+        try {
+            Review review = bookingSystem.submitReview(member, lesson, rating, comment);
+            System.out.println("Review submitted: " + review);
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            System.out.println("Review failed: " + e.getMessage());
+        }
     }
 
     // ── OPTION 7: View all bookings ───────────────────────────────────────────

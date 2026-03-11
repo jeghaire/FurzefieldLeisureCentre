@@ -16,6 +16,7 @@ public class Lesson {
     private final Day day;
     private final TimeSlot timeSlot;
     private final List<Booking> bookings;
+    private final List<Review> reviews = new ArrayList<>();
 
     public Lesson(ExerciseType exerciseType, int weekendNumber, Day day, TimeSlot timeSlot) {
         this.exerciseType  = exerciseType;
@@ -38,6 +39,25 @@ public class Lesson {
     public void addBooking(Booking booking)    { bookings.add(booking); }
     public void removeBooking(Booking booking) { bookings.remove(booking); }
 
+    public void addReview(Review review) {
+        reviews.add(review);
+    }
+
+    public List<Review> getReviews() {
+        return new ArrayList<>(reviews);
+    }
+
+    public double getAverageRating() {
+        if (reviews.isEmpty()) return 0.0;
+        return reviews.stream()
+                .mapToInt(Review::getRating)
+                .average()
+                .orElse(0.0);
+    }
+
+    public double getTotalIncome() {
+        return exerciseType.getPrice() * bookings.size();
+    }
     @Override
     public String toString() {
         return String.format("Week %-2d | %-9s | %-9s | %-11s | £%5.2f | Spaces: %d/4",

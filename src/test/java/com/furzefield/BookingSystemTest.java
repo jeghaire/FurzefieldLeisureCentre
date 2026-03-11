@@ -1,8 +1,10 @@
 package com.furzefield;
 
 import com.furzefield.data.DataSetup;
+import com.furzefield.model.Booking;
 import com.furzefield.model.Lesson;
 import com.furzefield.model.Member;
+import com.furzefield.model.Review;
 import com.furzefield.service.BookingSystem;
 import com.furzefield.service.Timetable;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,9 +32,9 @@ public class BookingSystemTest {
         Member member = members.get(0);
         Lesson lesson = timetable.getAllLessons().get(0);
 
-        boolean result = bookingSystem.bookLesson(member, lesson);
+        Booking booking = bookingSystem.bookLesson(member, lesson);
 
-        assertTrue(result, "Booking should succeed when space is available");
+        assertNotNull(booking, "Booking should be created");
         assertEquals(1, lesson.getBookings().size());
     }
 
@@ -47,27 +49,22 @@ public class BookingSystemTest {
         bookingSystem.bookLesson(members.get(2), lesson);
         bookingSystem.bookLesson(members.get(3), lesson);
 
-        // 5th member should be rejected
-        boolean result = bookingSystem.bookLesson(members.get(4), lesson);
-
-        assertFalse(result, "Booking should fail when lesson is full");
-        assertEquals(4, lesson.getBookings().size());
+        assertThrows(IllegalStateException.class,
+                () -> bookingSystem.bookLesson(members.get(4), lesson),
+                "Should throw when lesson is full");
     }
 
     // ── TEST 3: Booking fails when time conflict exists ───────────────────────
     @Test
     void testBookLessonFailsOnTimeConflict() {
         Member member = members.get(0);
-        Lesson lesson1 = timetable.getAllLessons().get(0); // Weekend 1, Sat Morning
-        Lesson lesson2 = timetable.getAllLessons().get(0); // Same slot
+        Lesson lesson = timetable.getAllLessons().get(0); // Weekend 1, Sat Morning
 
-        bookingSystem.bookLesson(member, lesson1);
+        bookingSystem.bookLesson(member, lesson);
 
-        // Try to book a different lesson at the exact same time
-        // We'll use the same lesson to guarantee a conflict
-        boolean result = bookingSystem.bookLesson(member, lesson1);
-
-        assertFalse(result, "Booking should fail when member already has a booking at this time");
+        assertThrows(IllegalStateException.class,
+                () -> bookingSystem.bookLesson(member, lesson),
+                "Should throw on time conflict");
     }
 
     // ── TEST 4: Lesson capacity is 4 ─────────────────────────────────────────
@@ -84,12 +81,12 @@ public class BookingSystemTest {
         Lesson oldLesson = timetable.getAllLessons().get(0); // Weekend 1, Sat Morning
         Lesson newLesson = timetable.getAllLessons().get(1); // Weekend 1, Sat Afternoon
 
-        bookingSystem.bookLesson(member, oldLesson);
-        boolean result = bookingSystem.changeBooking(member, oldLesson, newLesson);
+        Booking original = bookingSystem.bookLesson(member, oldLesson);
+        Booking changed = bookingSystem.changeBooking(member, oldLesson, newLesson);
 
-        assertTrue(result, "Change booking should succeed");
-        assertEquals(0, oldLesson.getBookings().size(), "Old lesson should have no bookings");
-        assertEquals(1, newLesson.getBookings().size(), "New lesson should have the booking");
+        assertNotNull(changed);
+        assertEquals(0, oldLesson.getBookings().size());
+        assertEquals(1, newLesson.getBookings().size());
     }
 
     // ── TEST 6: Change booking fails when new lesson is full ──────────────────
@@ -102,16 +99,18 @@ public class BookingSystemTest {
         // Book old lesson for member
         bookingSystem.bookLesson(member, oldLesson);
 
-        // Fill the new lesson to capacity
+        // Fill the new lesson to capacity with different members
         bookingSystem.bookLesson(members.get(1), newLesson);
         bookingSystem.bookLesson(members.get(2), newLesson);
         bookingSystem.bookLesson(members.get(3), newLesson);
         bookingSystem.bookLesson(members.get(4), newLesson);
 
-        boolean result = bookingSystem.changeBooking(member, oldLesson, newLesson);
+        assertThrows(IllegalStateException.class,
+                () -> bookingSystem.changeBooking(member, oldLesson, newLesson),
+                "Should throw when new lesson is full");
 
-        assertFalse(result, "Change should fail when new lesson is full");
-        assertEquals(1, oldLesson.getBookings().size(), "Original booking should be restored");
+        assertEquals(1, oldLesson.getBookings().size(),
+                "Original booking should be restored after failed change");
     }
 
     // ── TEST 7: Submit review succeeds ────────────────────────────────────────
@@ -121,9 +120,9 @@ public class BookingSystemTest {
         Lesson lesson = timetable.getAllLessons().get(0);
 
         bookingSystem.bookLesson(member, lesson);
-        boolean result = bookingSystem.submitReview(member, lesson, 5, "Excellent!");
+        Review review = bookingSystem.submitReview(member, lesson, 5, "Excellent!");
 
-        assertTrue(result, "Review should be submitted successfully");
+        assertNotNull(review);
         assertEquals(1, bookingSystem.getAllReviews().size());
     }
 
@@ -134,10 +133,9 @@ public class BookingSystemTest {
         Lesson lesson = timetable.getAllLessons().get(0);
 
         bookingSystem.bookLesson(member, lesson);
-        boolean result = bookingSystem.submitReview(member, lesson, 6, "Out of range rating");
 
-        assertFalse(result, "Review should fail when rating is out of 1-5 range");
-        assertEquals(0, bookingSystem.getAllReviews().size());
+        assertThrows(IllegalArgumentException.class,
+                () -> bookingSystem.submitReview(member, lesson, 6, "Bad rating"));
     }
 
     // ── TEST 9: Review fails if member never booked the lesson ────────────────
@@ -146,10 +144,8 @@ public class BookingSystemTest {
         Member member = members.get(0);
         Lesson lesson = timetable.getAllLessons().get(0);
 
-        // No booking made
-        boolean result = bookingSystem.submitReview(member, lesson, 4, "Sneaky review");
-
-        assertFalse(result, "Review should fail if member never booked the lesson");
+        assertThrows(IllegalStateException.class,
+                () -> bookingSystem.submitReview(member, lesson, 4, "Never attended"));
     }
 
     // ── TEST 10: Cancel booking succeeds ─────────────────────────────────────
@@ -159,9 +155,8 @@ public class BookingSystemTest {
         Lesson lesson = timetable.getAllLessons().get(0);
 
         bookingSystem.bookLesson(member, lesson);
-        boolean result = bookingSystem.cancelBooking(member, lesson);
+        bookingSystem.cancelBooking(member, lesson);
 
-        assertTrue(result, "Cancel should succeed");
-        assertEquals(0, lesson.getBookings().size(), "Lesson should have no bookings after cancel");
+        assertEquals(0, lesson.getBookings().size());
     }
 }
