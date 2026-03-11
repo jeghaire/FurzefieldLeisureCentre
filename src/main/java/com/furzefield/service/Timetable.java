@@ -58,4 +58,12 @@ public class Timetable {
         }
         return result;
     }
+
+    // Search by id
+    public Lesson findById(String lessonId) {
+        for (Lesson l : lessons) {
+            if (l.getLessonId().equalsIgnoreCase(lessonId)) return l;
+        }
+        return null;
+    }
 }

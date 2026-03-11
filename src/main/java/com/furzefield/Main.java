@@ -10,6 +10,7 @@ import com.furzefield.model.Review;
 import com.furzefield.service.BookingSystem;
 import com.furzefield.service.Timetable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -208,26 +209,36 @@ public class Main {
 
     private static Lesson selectLesson() {
         System.out.println("\n── Select Lesson ──");
-        System.out.println("Search by: 1. Day   2. Exercise name");
+        System.out.println("Search by: 1. Day   2. Exercise name   3. Enter lesson ID directly");
         int choice = readInt("Choice: ");
 
-        List<Lesson> lessons;
+        List<Lesson> lessons = new ArrayList<>();
+
         if (choice == 1) {
             System.out.println("1. Saturday  2. Sunday");
             int day = readInt("Select: ");
             Day dayEnum = (day == 1) ? Day.SATURDAY : Day.SUNDAY;
             lessons = bookingSystem.getTimetable().getLessonsByDay(dayEnum);
-        } else {
-        System.out.print("Enter exercise name: ");
-        String name = scanner.nextLine().trim();
-        try {
-            ExerciseType type = ExerciseType.fromDisplayName(name);
-            lessons = bookingSystem.getTimetable().getLessonsByExercise(type);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Exercise not found: " + name);
-            return null;
+        } else if (choice == 2) {
+            System.out.print("Enter exercise name: ");
+            String name = scanner.nextLine().trim();
+            try {
+                ExerciseType type = ExerciseType.fromDisplayName(name);
+                lessons = bookingSystem.getTimetable().getLessonsByExercise(type);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Exercise not found: " + name);
+                return null;
+            }
+        } else if (choice == 3) {
+            System.out.print("Enter lesson ID (e.g. W1SM): ");
+            String lessonId = scanner.nextLine().trim().toUpperCase();
+            Lesson lesson = bookingSystem.getTimetable().findById(lessonId);
+            if (lesson == null) {
+                System.out.println("Lesson not found: " + lessonId);
+                return null;
+            }
+            return lesson;
         }
-    }
 
         if (lessons.isEmpty()) {
             System.out.println("No lessons found.");

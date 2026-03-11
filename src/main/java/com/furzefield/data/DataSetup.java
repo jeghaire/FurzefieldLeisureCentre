@@ -49,16 +49,19 @@ public class DataSetup {
                 {ExerciseType.YOGA,       ExerciseType.ZUMBA,      ExerciseType.AQUACISE  },
         };
 
-        Day[] days = {Day.SATURDAY, Day.SUNDAY};
-        TimeSlot[] slots = {TimeSlot.MORNING, TimeSlot.AFTERNOON, TimeSlot.EVENING};
+        Day[]      days      = {Day.SATURDAY, Day.SUNDAY};
+        TimeSlot[] slots     = {TimeSlot.MORNING, TimeSlot.AFTERNOON, TimeSlot.EVENING};
+        String[]   dayCode   = {"S", "D"};
+        String[]   slotCode  = {"M", "A", "E"};
 
         int index = 0;
         for (int weekend = 1; weekend <= 8; weekend++) {
-            for (Day day : days) {
+            for (int d = 0; d < days.length; d++) {
                 ExerciseType[] daySchedule = schedule[index++];
                 for (int s = 0; s < slots.length; s++) {
+                    String lessonId = "W" + weekend + dayCode[d] + slotCode[s];
                     timetable.addLesson(
-                            new Lesson(daySchedule[s], weekend, day, slots[s])
+                            new Lesson(lessonId, daySchedule[s], weekend, days[d], slots[s])
                     );
                 }
             }

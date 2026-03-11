@@ -11,21 +11,25 @@ public class Lesson {
 
     public static final int MAX_CAPACITY = 4;
 
+    private final String lessonId;
     private final ExerciseType exerciseType;
     private final int weekendNumber;
     private final Day day;
     private final TimeSlot timeSlot;
     private final List<Booking> bookings;
-    private final List<Review> reviews = new ArrayList<>();
+    private final List<Review> reviews;
 
-    public Lesson(ExerciseType exerciseType, int weekendNumber, Day day, TimeSlot timeSlot) {
+    public Lesson(String lessonId, ExerciseType exerciseType, int weekendNumber, Day day, TimeSlot timeSlot) {
+        this.lessonId      = lessonId;
         this.exerciseType  = exerciseType;
         this.weekendNumber = weekendNumber;
         this.day           = day;
         this.timeSlot      = timeSlot;
         this.bookings      = new ArrayList<>();
+        this.reviews       = new ArrayList<>();
     }
 
+    public String getLessonId() { return lessonId; }
     public ExerciseType getExerciseType()  { return exerciseType; }
     public int getWeekendNumber()          { return weekendNumber; }
     public Day getDay()                    { return day; }
@@ -58,9 +62,11 @@ public class Lesson {
     public double getTotalIncome() {
         return exerciseType.getPrice() * bookings.size();
     }
+
     @Override
     public String toString() {
-        return String.format("Week %-2d | %-9s | %-9s | %-11s | £%5.2f | Spaces: %d/4",
+        return String.format("%-6s | Week %-2d | %-9s | %-9s | %-11s | £%5.2f | Spaces: %d/4",
+                lessonId,
                 weekendNumber,
                 day.getDisplayName(),
                 timeSlot.getDisplayName(),
