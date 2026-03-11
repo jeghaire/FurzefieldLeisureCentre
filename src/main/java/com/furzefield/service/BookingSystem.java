@@ -12,7 +12,6 @@ import java.util.List;
 
 /**
  * BookingSystem — Facade Pattern
- *
  * This class acts as the single entry point for all system operations.
  * The console menu (Main.java) interacts only with BookingSystem,
  * which internally coordinates Member, Lesson, Booking, Review,
@@ -74,13 +73,7 @@ public class BookingSystem {
     // ── CHANGE BOOKING ────────────────────────────────────────────────────────
 
     public Booking changeBooking(Member member, Lesson oldLesson, Lesson newLesson) {
-        Booking existingBooking = findBooking(member, oldLesson);
-
-        if (existingBooking == null) {
-            throw new IllegalArgumentException(
-                    "No booking found for " + member.getName()
-                            + " in " + oldLesson.getExerciseType().getDisplayName());
-        }
+        Booking existingBooking = findBookingOrThrow(member, oldLesson);
 
         // Temporarily remove old booking so conflict check works correctly
         oldLesson.removeBooking(existingBooking);
@@ -101,13 +94,7 @@ public class BookingSystem {
     // ── CANCEL BOOKING ────────────────────────────────────────────────────────
 
     public void cancelBooking(Member member, Lesson lesson) {
-        Booking booking = findBooking(member, lesson);
-
-        if (booking == null) {
-            throw new IllegalArgumentException(
-                    "No booking found for " + member.getName()
-                            + " in " + lesson.getExerciseType().getDisplayName());
-        }
+        Booking booking = findBookingOrThrow(member, lesson);
 
         lesson.removeBooking(booking);
         member.removeBooking(booking);
@@ -239,6 +226,16 @@ public class BookingSystem {
             }
         }
         return null;
+    }
+
+    private Booking findBookingOrThrow(Member member, Lesson lesson) {
+        Booking booking = findBooking(member, lesson);
+        if (booking == null) {
+            throw new IllegalArgumentException(
+                    "No booking found for " + member.getName()
+                            + " in " + lesson.getExerciseType().getDisplayName());
+        }
+        return booking;
     }
 
     public List<Booking> getAllBookings() {
