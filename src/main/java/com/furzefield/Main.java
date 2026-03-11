@@ -40,7 +40,7 @@ public class Main {
         boolean running = true;
         while (running) {
             printMenu();
-            int choice = readInt("Enter choice: ");
+            int choice = readInt();
             switch (choice) {
                 case 1 -> viewTimetableByDay();
                 case 2 -> viewTimetableByExercise();
@@ -83,7 +83,8 @@ public class Main {
     private static void viewTimetableByDay() {
         System.out.println("1. Saturday");
         System.out.println("2. Sunday");
-        int choice = readInt("Select day: ");
+        int choice = readIntCanCancel("Select day: ");
+        if (choice == 0) return;
         Day day = (choice == 1) ? Day.SATURDAY : Day.SUNDAY;
         bookingSystem.viewTimetableByDay(day);
     }
@@ -91,8 +92,8 @@ public class Main {
     // ── OPTION 2: View timetable by exercise ─────────────────────────────────
 
     private static void viewTimetableByExercise() {
-        System.out.println("Enter exercise name (Yoga / Zumba / Aquacise / Box Fit / Body Blitz): ");
-        String name = scanner.nextLine().trim();
+        String name = readStringWithCancel("Enter exercise name (Yoga / Zumba / Aquacise / Box Fit / Body Blitz): ");
+        if (name == null) return;
         try {
             ExerciseType type = ExerciseType.fromDisplayName(name);
             bookingSystem.viewTimetableByExercise(type);
@@ -166,9 +167,10 @@ public class Main {
         Lesson lesson = selectLesson();
         if (lesson == null) return;
 
-        int rating = readInt("Enter rating (1-5): ");
-        System.out.print("Enter comment: ");
-        String comment = scanner.nextLine().trim();
+        int rating = readIntCanCancel("Enter rating (1-5): ");
+        if (rating == 0) return;
+        String comment = readStringWithCancel("Enter comment: ");
+        if (comment == null) return;
 
         try {
             Review review = bookingSystem.submitReview(member, lesson, rating, comment);
@@ -199,7 +201,8 @@ public class Main {
         for (Member m : members) {
             System.out.println(m.getId() + ". " + m.getName());
         }
-        int id = readInt("Enter member number: ");
+        int id = readIntCanCancel("Enter member number: ");
+        if (id == 0) return null;
         for (Member m : members) {
             if (m.getId() == id) return m;
         }
@@ -210,18 +213,20 @@ public class Main {
     private static Lesson selectLesson() {
         System.out.println("\n── Select Lesson ──");
         System.out.println("Search by: 1. Day   2. Exercise name   3. Enter lesson ID directly");
-        int choice = readInt("Choice: ");
+        int choice = readIntCanCancel("Choice: ");
+        if (choice == 0) return null;
 
         List<Lesson> lessons = new ArrayList<>();
 
         if (choice == 1) {
             System.out.println("1. Saturday  2. Sunday");
-            int day = readInt("Select: ");
+            int day = readIntCanCancel("Select: ");
+            if (day == 0) return null;
             Day dayEnum = (day == 1) ? Day.SATURDAY : Day.SUNDAY;
             lessons = bookingSystem.getTimetable().getLessonsByDay(dayEnum);
         } else if (choice == 2) {
-            System.out.print("Enter exercise name: ");
-            String name = scanner.nextLine().trim();
+            String name = readStringWithCancel("Enter exercise name: ");
+            if (name == null) return null;
             try {
                 ExerciseType type = ExerciseType.fromDisplayName(name);
                 lessons = bookingSystem.getTimetable().getLessonsByExercise(type);
@@ -231,7 +236,8 @@ public class Main {
             }
         } else if (choice == 3) {
             System.out.print("Enter lesson ID (e.g. W1SM): ");
-            String lessonId = scanner.nextLine().trim().toUpperCase();
+            String lessonId = readStringWithCancel("Enter lesson ID (e.g. W1SM): ");
+            if (lessonId == null) return null;
             Lesson lesson = bookingSystem.getTimetable().findById(lessonId);
             if (lesson == null) {
                 System.out.println("Lesson not found: " + lessonId);
@@ -249,7 +255,8 @@ public class Main {
             System.out.println((i + 1) + ". " + lessons.get(i));
         }
 
-        int index = readInt("Select lesson number: ");
+        int index = readIntCanCancel("Select lesson number: ");
+        if (index == 0) return null;
         if (index < 1 || index > lessons.size()) {
             System.out.println("Invalid selection.");
             return null;
@@ -257,8 +264,8 @@ public class Main {
         return lessons.get(index - 1);
     }
 
-    private static int readInt(String prompt) {
-        System.out.print(prompt);
+    private static int readInt() {
+        System.out.print("Enter choice: ");
         while (!scanner.hasNextInt()) {
             scanner.next();
             System.out.print("Please enter a number: ");
@@ -266,5 +273,23 @@ public class Main {
         int val = scanner.nextInt();
         scanner.nextLine(); // clear buffer
         return val;
+    }
+
+    private static int readIntCanCancel(String prompt) {
+        System.out.print(prompt + " (0 to cancel): ");
+        while (!scanner.hasNextInt()) {
+            scanner.next();
+            System.out.print("Please enter a number: ");
+        }
+        int val = scanner.nextInt();
+        scanner.nextLine();
+        return val;
+    }
+
+    private static String readStringWithCancel(String prompt) {
+        System.out.print(prompt + " (or 0 to cancel): ");
+        String input = scanner.nextLine().trim();
+        if (input.equals("0")) return null;
+        return input;
     }
 }
