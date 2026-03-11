@@ -51,7 +51,7 @@ public class DataSetup {
 
         Day[]      days      = {Day.SATURDAY, Day.SUNDAY};
         TimeSlot[] slots     = {TimeSlot.MORNING, TimeSlot.AFTERNOON, TimeSlot.EVENING};
-        String[]   dayCode   = {"S", "D"};
+        String[]   dayCode   = {"S", "U"};
         String[]   slotCode  = {"M", "A", "E"};
 
         int index = 0;

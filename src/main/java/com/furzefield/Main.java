@@ -23,8 +23,8 @@ public class Main {
     private static List<Member> members;
     private static final Scanner scanner = new Scanner(System.in);
 
-    static void main() {
-        // Initialise all data
+    public static void main(String[] args) {
+    // Initialise all data
         members = DataSetup.createMembers();
         Timetable timetable = DataSetup.createTimetable();
         bookingSystem = BookingSystem.getInstance(timetable, members);
@@ -85,6 +85,10 @@ public class Main {
         System.out.println("2. Sunday");
         int choice = readIntCanCancel("Select day: ");
         if (choice == 0) return;
+        if (choice != 1 && choice != 2) {
+            System.out.println("Invalid choice. Please enter 1 or 2.");
+            return;
+        }
         Day day = (choice == 1) ? Day.SATURDAY : Day.SUNDAY;
         bookingSystem.viewTimetableByDay(day);
     }
@@ -222,6 +226,10 @@ public class Main {
             System.out.println("1. Saturday  2. Sunday");
             int day = readIntCanCancel("Select: ");
             if (day == 0) return null;
+            if (day != 1 && day != 2) {
+                System.out.println("Invalid choice. Please enter 1 or 2.");
+                return null;
+            }
             Day dayEnum = (day == 1) ? Day.SATURDAY : Day.SUNDAY;
             lessons = bookingSystem.getTimetable().getLessonsByDay(dayEnum);
         } else if (choice == 2) {
@@ -235,7 +243,6 @@ public class Main {
                 return null;
             }
         } else if (choice == 3) {
-            System.out.print("Enter lesson ID (e.g. W1SM): ");
             String lessonId = readStringWithCancel("Enter lesson ID (e.g. W1SM): ");
             if (lessonId == null) return null;
             Lesson lesson = bookingSystem.getTimetable().findById(lessonId);

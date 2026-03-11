@@ -156,19 +156,9 @@ public class BookingSystem {
         for (Lesson lesson : timetable.getAllLessons()) {
             int memberCount = lesson.getBookings().size();
 
-            // Calculate average rating for this lesson
-            double total = 0;
-            int reviewCount = 0;
-            for (Review r : allReviews) {
-                if (r.lesson().equals(lesson)) {
-                    total += r.rating();
-                    reviewCount++;
-                }
-            }
-
-            String avgRating = (reviewCount > 0)
-                    ? String.format("%.1f", total / reviewCount)
-                    : "No reviews";
+            String avgRating = lesson.getReviews().isEmpty()
+                    ? "No reviews"
+                    : String.format("%.1f", lesson.getAverageRating());
 
             System.out.println("Weekend " + lesson.getWeekendNumber()
                     + " | " + lesson.getDay()
@@ -187,33 +177,26 @@ public class BookingSystem {
         System.out.println("========================================");
 
         // Get all unique lesson type names
-        List<String> exerciseNames = new ArrayList<>();
-        for (Lesson l : timetable.getAllLessons()) {
-            String name = l.getExerciseType().getDisplayName();
-            if (!exerciseNames.contains(name)) {
-                exerciseNames.add(name);
-            }
-        }
-
-        String topExercise = "";
+        ExerciseType topExercise = null;
         double topIncome = 0;
 
-        for (String name : exerciseNames) {
+        for (ExerciseType type : ExerciseType.values()) {
             double income = 0;
             for (Lesson l : timetable.getAllLessons()) {
-                if (l.getExerciseType().getDisplayName().equals(name)) {
-                    income += l.getBookings().size() * l.getExerciseType().getPrice();
+                if (l.getExerciseType() == type) {
+                    income += l.getTotalIncome();
                 }
             }
-            System.out.println(name + ": £" + String.format("%.2f", income));
+            System.out.println(type.getDisplayName() + ": £" + String.format("%.2f", income));
 
             if (income > topIncome) {
                 topIncome = income;
-                topExercise = name;
+                topExercise = type;
             }
         }
 
-        System.out.println("\nHighest income: " + topExercise
+        System.out.println("\nHighest income: "
+                + (topExercise != null ? topExercise.getDisplayName() : "None")
                 + " (£" + String.format("%.2f", topIncome) + ")");
     }
 
