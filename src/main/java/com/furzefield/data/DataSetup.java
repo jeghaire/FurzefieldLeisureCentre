@@ -14,16 +14,16 @@ public class DataSetup {
 
     public static List<Member> createMembers() {
         List<Member> members = new ArrayList<>();
-        members.add(new Member(1, "Alice Johnson"));
-        members.add(new Member(2, "Bob Smith"));
-        members.add(new Member(3, "Carol White"));
-        members.add(new Member(4, "David Brown"));
-        members.add(new Member(5, "Emma Davis"));
-        members.add(new Member(6, "Frank Wilson"));
-        members.add(new Member(7, "Grace Taylor"));
-        members.add(new Member(8, "Harry Moore"));
-        members.add(new Member(9, "Isla Martin"));
-        members.add(new Member(10, "Jack Thompson"));
+        members.add(new Member(1,  "Alice Johnson", "alice@flc.com"));
+        members.add(new Member(2,  "Bob Smith",     "bob@flc.com"));
+        members.add(new Member(3,  "Carol White",   "carol@flc.com"));
+        members.add(new Member(4,  "David Brown",   "david@flc.com"));
+        members.add(new Member(5,  "Emma Davis",    "emma@flc.com"));
+        members.add(new Member(6,  "Frank Wilson",  "frank@flc.com"));
+        members.add(new Member(7,  "Grace Taylor",  "grace@flc.com"));
+        members.add(new Member(8,  "Harry Moore",   "harry@flc.com"));
+        members.add(new Member(9,  "Isla Martin",   "isla@flc.com"));
+        members.add(new Member(10, "Jack Thompson", "jack@flc.com"));
         return members;
     }
 

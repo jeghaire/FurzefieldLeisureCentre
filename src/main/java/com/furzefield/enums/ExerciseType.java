@@ -18,6 +18,13 @@ public enum ExerciseType {
     public String getDisplayName() { return displayName; }
     public double getPrice()       { return price; }
 
+    public static ExerciseType fromDisplayName(String name) {
+        for (ExerciseType type : values()) {
+            if (type.displayName.equalsIgnoreCase(name.trim())) return type;
+        }
+        throw new IllegalArgumentException("Unknown exercise type: " + name);
+    }
+
     @Override
     public String toString() { return displayName; }
 }

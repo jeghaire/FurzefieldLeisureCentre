@@ -7,18 +7,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Member {
-    private int id;
-    private String name;
-    private List<Booking> bookings;
+    private final int id;
+    private final String name;
+    private final List<Booking> bookings;
+    private final String email;
 
-    public Member(int id, String name) {
+    public Member(int id, String name, String email) {
         this.id       = id;
         this.name     = name;
+        this.email    = email;
         this.bookings = new ArrayList<>();
     }
 
     public int getId()                     { return id; }
     public String getName()                { return name; }
+    public String getEmail() { return email; }
     public List<Booking> getBookings()     { return new ArrayList<>(bookings); }
 
     public void addBooking(Booking booking) {
@@ -48,6 +51,6 @@ public class Member {
 
     @Override
     public String toString() {
-        return "Member #" + id + " - " + name;
+        return "Member #" + id + " - " + name + " (" + email + ")";
     }
 }

@@ -1,5 +1,6 @@
 package com.furzefield.service;
 
+import com.furzefield.enums.ExerciseType;
 import com.furzefield.model.Booking;
 import com.furzefield.model.Lesson;
 import com.furzefield.model.Member;
@@ -147,11 +148,11 @@ public class BookingSystem {
         }
     }
 
-    public void viewTimetableByExercise(String exerciseName) {
-        System.out.println("\n── Timetable for " + exerciseName + " ──");
-        List<Lesson> lessons = timetable.getLessonsByExercise(exerciseName);
+    public void viewTimetableByExercise(ExerciseType exerciseType) {
+        System.out.println("\n── Timetable for " + exerciseType.getDisplayName() + " ──");
+        List<Lesson> lessons = timetable.getLessonsByExercise(exerciseType);
         if (lessons.isEmpty()) {
-            System.out.println("No lessons found for: " + exerciseName);
+            System.out.println("No lessons found.");
             return;
         }
         for (Lesson l : lessons) {

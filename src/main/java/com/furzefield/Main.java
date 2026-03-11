@@ -2,6 +2,7 @@ package com.furzefield;
 
 import com.furzefield.data.DataSetup;
 import com.furzefield.enums.Day;
+import com.furzefield.enums.ExerciseType;
 import com.furzefield.model.Booking;
 import com.furzefield.model.Lesson;
 import com.furzefield.model.Member;
@@ -91,7 +92,12 @@ public class Main {
     private static void viewTimetableByExercise() {
         System.out.println("Enter exercise name (Yoga / Zumba / Aquacise / Box Fit / Body Blitz): ");
         String name = scanner.nextLine().trim();
-        bookingSystem.viewTimetableByExercise(name);
+        try {
+            ExerciseType type = ExerciseType.fromDisplayName(name);
+            bookingSystem.viewTimetableByExercise(type);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Exercise not found: " + name);
+        }
     }
 
     // ── OPTION 3: Book a lesson ───────────────────────────────────────────────
@@ -212,10 +218,16 @@ public class Main {
             Day dayEnum = (day == 1) ? Day.SATURDAY : Day.SUNDAY;
             lessons = bookingSystem.getTimetable().getLessonsByDay(dayEnum);
         } else {
-            System.out.print("Enter exercise name: ");
-            String name = scanner.nextLine().trim();
-            lessons = bookingSystem.getTimetable().getLessonsByExercise(name);
+        System.out.print("Enter exercise name: ");
+        String name = scanner.nextLine().trim();
+        try {
+            ExerciseType type = ExerciseType.fromDisplayName(name);
+            lessons = bookingSystem.getTimetable().getLessonsByExercise(type);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Exercise not found: " + name);
+            return null;
         }
+    }
 
         if (lessons.isEmpty()) {
             System.out.println("No lessons found.");
