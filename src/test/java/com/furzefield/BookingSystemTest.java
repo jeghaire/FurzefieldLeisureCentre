@@ -1,6 +1,8 @@
 package com.furzefield;
 
 import com.furzefield.data.DataSetup;
+import com.furzefield.enums.Day;
+import com.furzefield.enums.ExerciseType;
 import com.furzefield.model.Booking;
 import com.furzefield.model.Lesson;
 import com.furzefield.model.Member;
@@ -8,10 +10,15 @@ import com.furzefield.model.Review;
 import com.furzefield.service.BookingSystem;
 import com.furzefield.service.Timetable;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.MethodOrderer;
+
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestMethodOrder(MethodOrderer.DisplayName.class)
 public class BookingSystemTest {
 
     private BookingSystem bookingSystem;
@@ -26,8 +33,10 @@ public class BookingSystemTest {
         bookingSystem = BookingSystem.getInstance(timetable, members);
     }
 
-    // ── TEST 1: Successful booking ────────────────────────────────────────────
+    // ── 1. Booking ────────────────────────────────────────────────────────────
+
     @Test
+    @DisplayName("1a. Book a lesson successfully")
     void testBookLessonSuccess() {
         Member member = members.get(0);
         Lesson lesson = timetable.getAllLessons().get(0);
@@ -38,12 +47,11 @@ public class BookingSystemTest {
         assertEquals(1, lesson.getBookings().size());
     }
 
-    // ── TEST 2: Booking fails when lesson is full ─────────────────────────────
     @Test
+    @DisplayName("1b. Booking fails when lesson is full")
     void testBookLessonFailsWhenFull() {
         Lesson lesson = timetable.getAllLessons().get(0);
 
-        // Fill the lesson to capacity (max 4)
         bookingSystem.bookLesson(members.get(0), lesson);
         bookingSystem.bookLesson(members.get(1), lesson);
         bookingSystem.bookLesson(members.get(2), lesson);
@@ -54,11 +62,11 @@ public class BookingSystemTest {
                 "Should throw when lesson is full");
     }
 
-    // ── TEST 3: Booking fails when time conflict exists ───────────────────────
     @Test
+    @DisplayName("1c. Booking fails when time conflict exists")
     void testBookLessonFailsOnTimeConflict() {
         Member member = members.get(0);
-        Lesson lesson = timetable.getAllLessons().get(0); // Weekend 1, Sat Morning
+        Lesson lesson = timetable.getAllLessons().get(0);
 
         bookingSystem.bookLesson(member, lesson);
 
@@ -67,21 +75,22 @@ public class BookingSystemTest {
                 "Should throw on time conflict");
     }
 
-    // ── TEST 4: Lesson capacity is 4 ─────────────────────────────────────────
     @Test
+    @DisplayName("1d. Max capacity is 4")
     void testMaxCapacityIsFour() {
-        Lesson lesson = timetable.getAllLessons().get(0);
         assertEquals(4, Lesson.MAX_CAPACITY);
     }
 
-    // ── TEST 5: Change booking succeeds ──────────────────────────────────────
+    // ── 2. Change booking ─────────────────────────────────────────────────────
+
     @Test
+    @DisplayName("2a. Change booking succeeds")
     void testChangeBookingSuccess() {
         Member member = members.get(0);
-        Lesson oldLesson = timetable.getAllLessons().get(0); // Weekend 1, Sat Morning
-        Lesson newLesson = timetable.getAllLessons().get(1); // Weekend 1, Sat Afternoon
+        Lesson oldLesson = timetable.getAllLessons().get(0);
+        Lesson newLesson = timetable.getAllLessons().get(1);
 
-        Booking original = bookingSystem.bookLesson(member, oldLesson);
+        bookingSystem.bookLesson(member, oldLesson);
         Booking changed = bookingSystem.changeBooking(member, oldLesson, newLesson);
 
         assertNotNull(changed);
@@ -89,17 +98,14 @@ public class BookingSystemTest {
         assertEquals(1, newLesson.getBookings().size());
     }
 
-    // ── TEST 6: Change booking fails when new lesson is full ──────────────────
     @Test
+    @DisplayName("2b. Change booking fails when new lesson is full")
     void testChangeBookingFailsWhenNewLessonFull() {
         Member member = members.get(0);
         Lesson oldLesson = timetable.getAllLessons().get(0);
         Lesson newLesson = timetable.getAllLessons().get(1);
 
-        // Book old lesson for member
         bookingSystem.bookLesson(member, oldLesson);
-
-        // Fill the new lesson to capacity with different members
         bookingSystem.bookLesson(members.get(1), newLesson);
         bookingSystem.bookLesson(members.get(2), newLesson);
         bookingSystem.bookLesson(members.get(3), newLesson);
@@ -113,8 +119,24 @@ public class BookingSystemTest {
                 "Original booking should be restored after failed change");
     }
 
-    // ── TEST 7: Submit review succeeds ────────────────────────────────────────
+    // ── 3. Cancel booking ─────────────────────────────────────────────────────
+
     @Test
+    @DisplayName("3a. Cancel booking succeeds")
+    void testCancelBookingSuccess() {
+        Member member = members.get(0);
+        Lesson lesson = timetable.getAllLessons().get(0);
+
+        bookingSystem.bookLesson(member, lesson);
+        bookingSystem.cancelBooking(member, lesson);
+
+        assertEquals(0, lesson.getBookings().size());
+    }
+
+    // ── 4. Reviews ────────────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("4a. Submit review succeeds")
     void testSubmitReviewSuccess() {
         Member member = members.get(0);
         Lesson lesson = timetable.getAllLessons().get(0);
@@ -126,8 +148,8 @@ public class BookingSystemTest {
         assertEquals(1, bookingSystem.getAllReviews().size());
     }
 
-    // ── TEST 8: Review fails with invalid rating ──────────────────────────────
     @Test
+    @DisplayName("4b. Review fails with invalid rating")
     void testSubmitReviewFailsWithInvalidRating() {
         Member member = members.get(0);
         Lesson lesson = timetable.getAllLessons().get(0);
@@ -138,8 +160,8 @@ public class BookingSystemTest {
                 () -> bookingSystem.submitReview(member, lesson, 6, "Bad rating"));
     }
 
-    // ── TEST 9: Review fails if member never booked the lesson ────────────────
     @Test
+    @DisplayName("4c. Review fails if member never booked the lesson")
     void testSubmitReviewFailsIfNotBooked() {
         Member member = members.get(0);
         Lesson lesson = timetable.getAllLessons().get(0);
@@ -148,15 +170,83 @@ public class BookingSystemTest {
                 () -> bookingSystem.submitReview(member, lesson, 4, "Never attended"));
     }
 
-    // ── TEST 10: Cancel booking succeeds ─────────────────────────────────────
+    // ── 5. Average rating ─────────────────────────────────────────────────────
+
     @Test
-    void testCancelBookingSuccess() {
+    @DisplayName("5a. Average rating calculates correctly")
+    void testAverageRating() {
         Member member = members.get(0);
+        Member member2 = members.get(1);
         Lesson lesson = timetable.getAllLessons().get(0);
 
         bookingSystem.bookLesson(member, lesson);
-        bookingSystem.cancelBooking(member, lesson);
+        bookingSystem.bookLesson(member2, lesson);
+        bookingSystem.submitReview(member, lesson, 4, "Good");
+        bookingSystem.submitReview(member2, lesson, 2, "Not great");
 
-        assertEquals(0, lesson.getBookings().size());
+        assertEquals(3.0, lesson.getAverageRating(), 0.001,
+                "Average of 4 and 2 should be 3.0");
+    }
+
+    @Test
+    @DisplayName("5b. No reviews returns 0.0 average")
+    void testAverageRatingNoReviews() {
+        Lesson lesson = timetable.getAllLessons().get(0);
+        assertEquals(0.0, lesson.getAverageRating(), 0.001);
+    }
+
+    // ── 6. Timetable lookups ──────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("6a. Filter timetable by day returns correct lessons")
+    void testGetLessonsByDay() {
+        List<Lesson> satLessons = timetable.getLessonsByDay(Day.SATURDAY);
+        assertTrue(satLessons.stream().allMatch(l -> l.getDay() == Day.SATURDAY),
+                "All returned lessons should be on Saturday");
+    }
+
+    @Test
+    @DisplayName("6b. Filter timetable by exercise type")
+    void testGetLessonsByExercise() {
+        List<Lesson> yogaLessons = timetable.getLessonsByExercise(ExerciseType.YOGA);
+        assertTrue(yogaLessons.stream().allMatch(l -> l.getExerciseType() == ExerciseType.YOGA),
+                "All returned lessons should be Yoga");
+    }
+
+    // ── 7. Income ─────────────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("7a. Income calculation is correct")
+    void testTotalIncome() {
+        Member member = members.get(0);
+        Member member2 = members.get(1);
+        Lesson lesson = timetable.getAllLessons().get(0);
+
+        bookingSystem.bookLesson(member, lesson);
+        bookingSystem.bookLesson(member2, lesson);
+
+        // Yoga price = £12.00, 2 members → £24.00
+        assertEquals(24.00, lesson.getTotalIncome(), 0.001);
+    }
+
+    // ── 8. Data integrity ─────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("8a. Full data load meets brief requirements")
+    void testFullDataLoad() {
+        DataSetup.createSeedBookings(bookingSystem, members, timetable);
+        DataSetup.createSeedReviews(bookingSystem, members, timetable);
+
+        assertTrue(members.size() >= 10,
+                "Should have at least 10 members");
+
+        long totalReviews = timetable.getAllLessons().stream()
+                .mapToLong(l -> l.getReviews().size())
+                .sum();
+        assertTrue(totalReviews >= 20,
+                "Should have at least 20 reviews, got: " + totalReviews);
+
+        assertTrue(timetable.getAllLessons().size() >= 48,
+                "Should have at least 48 lessons");
     }
 }

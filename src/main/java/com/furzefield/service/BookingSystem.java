@@ -88,8 +88,7 @@ public class BookingSystem {
         allBookings.remove(existingBooking);
 
         try {
-            Booking newBooking = bookLesson(member, newLesson);
-            return newBooking;
+            return bookLesson(member, newLesson);
         } catch (IllegalStateException e) {
             // Rollback
             oldLesson.addBooking(existingBooking);
