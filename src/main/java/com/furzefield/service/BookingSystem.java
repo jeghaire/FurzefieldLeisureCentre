@@ -242,11 +242,11 @@ public class BookingSystem {
     }
 
     public List<Booking> getAllBookings() {
-        return allBookings;
+        return new ArrayList<>(allBookings);
     }
 
     public List<Review> getAllReviews() {
-        return allReviews;
+        return new ArrayList<>(allReviews);
     }
 
     public Timetable getTimetable() {

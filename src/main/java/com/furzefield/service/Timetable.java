@@ -1,5 +1,6 @@
 package com.furzefield.service;
 
+import com.furzefield.enums.ExerciseType;
 import com.furzefield.model.Lesson;
 import com.furzefield.enums.Day;
 
@@ -22,7 +23,7 @@ public class Timetable {
     }
 
     public List<Lesson> getAllLessons() {
-        return lessons;
+        return new ArrayList<>(lessons);
     }
 
     // Search by day (Saturday or Sunday)
@@ -37,10 +38,10 @@ public class Timetable {
     }
 
     // Search by exercise name
-    public List<Lesson> getLessonsByExercise(String exerciseName) {
+    public List<Lesson> getLessonsByExercise(ExerciseType exerciseType) {
         List<Lesson> result = new ArrayList<>();
         for (Lesson l : lessons) {
-            if (l.getExerciseType().getDisplayName().equalsIgnoreCase(exerciseName)) {
+            if (l.getExerciseType() == exerciseType) {
                 result.add(l);
             }
         }
