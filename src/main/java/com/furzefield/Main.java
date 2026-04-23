@@ -235,8 +235,8 @@ public class Main {
     // ── OPTION 8: Attendance & rating report ─────────────────────────────────
 
     private static void printAttendanceReport() {
-        System.out.println("1. Month 1 (Weekends 1–4)");
-        System.out.println("2. Month 2 (Weekends 5–8)");
+        System.out.println("1. Month 1 (Weekends 1 to 4)");
+        System.out.println("2. Month 2 (Weekends 5 to 8)");
         while (true) {
             int choice = readIntCanCancel("Select month: ");
             if (choice == 0)

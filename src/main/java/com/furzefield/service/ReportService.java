@@ -3,6 +3,8 @@ package com.furzefield.service;
 import com.furzefield.enums.BookingStatus;
 import com.furzefield.enums.ExerciseType;
 import com.furzefield.model.Lesson;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -53,28 +55,36 @@ public class ReportService {
         System.out.printf("%-5s | %-11s | %-10s%n", "Rank", "Exercise", "Income");
         System.out.println("-".repeat(35));
 
-        ExerciseType topExercise = null;
-        double topIncome = 0;
-
-        int rank = 1;
+        List<double[]> rows = new ArrayList<>();
+        List<ExerciseType> types = new ArrayList<>();
         for (ExerciseType type : ExerciseType.values()) {
             double income = timetable.getAllLessons().stream()
                     .filter(l -> l.getExerciseType() == type)
                     .mapToDouble(Lesson::getTotalIncome)
                     .sum();
+            rows.add(new double[] { income });
+            types.add(type);
+        }
 
-            System.out.printf("%-5d | %-11s | £%-9.2f%n",
-                    rank++, type.getDisplayName(), income);
+        // Sort descending by income
+        List<Integer> order = new ArrayList<>();
+        for (int i = 0; i < types.size(); i++)
+            order.add(i);
+        order.sort((a, b) -> Double.compare(rows.get(b)[0], rows.get(a)[0]));
 
-            if (income > topIncome) {
-                topIncome = income;
-                topExercise = type;
+        int rank = 1;
+        for (int i = 0; i < order.size(); i++) {
+            if (i > 0 && rows.get(order.get(i))[0] < rows.get(order.get(i - 1))[0]) {
+                rank = i + 1;
             }
+            System.out.printf("%-5d | %-11s | £%-9.2f%n",
+                    rank, types.get(order.get(i)).getDisplayName(), rows.get(order.get(i))[0]);
         }
 
         System.out.println("-".repeat(35));
-        if (topExercise != null) {
-            System.out.println("Highest: " + topExercise.getDisplayName()
+        if (!order.isEmpty()) {
+            double topIncome = rows.get(order.getFirst())[0];
+            System.out.println("Highest: " + types.get(order.getFirst()).getDisplayName()
                     + " (£" + String.format("%.2f", topIncome) + ")");
         }
     }
