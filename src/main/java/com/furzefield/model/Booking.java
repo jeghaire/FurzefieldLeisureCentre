@@ -6,7 +6,6 @@ import com.furzefield.enums.BookingStatus;
  *
  * @author Mavi
  */
-
 public class Booking {
     private final String bookingId;
     private final Member member;

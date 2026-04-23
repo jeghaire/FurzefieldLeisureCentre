@@ -4,6 +4,10 @@ import com.furzefield.enums.BookingStatus;
 import com.furzefield.enums.ExerciseType;
 import com.furzefield.model.Lesson;
 
+/**
+ *
+ * @author Mavi
+ */
 public class ReportService {
 
     private final Timetable timetable;
@@ -12,13 +16,20 @@ public class ReportService {
         this.timetable = timetable;
     }
 
-    public void printAttendanceReport() {
-        System.out.println("\n══ Attendance & Rating Report ══");
+    public void printAttendanceReport(int month) {
+        int firstWeekend = (month == 1) ? 1 : 5;
+        int lastWeekend  = (month == 1) ? 4 : 8;
+
+        System.out.println("\n══ Attendance & Rating Report — Month " + month + " (Weekends " + firstWeekend + "–" + lastWeekend + ") ══");
         System.out.printf("%-6s | %-11s | %-9s | %-9s | %-8s | %-10s%n",
                 "ID", "Exercise", "Day", "Time", "Attended", "Avg Rating");
         System.out.println("-".repeat(70));
 
         for (Lesson lesson : timetable.getAllLessons()) {
+            if (lesson.getWeekendNumber() < firstWeekend || lesson.getWeekendNumber() > lastWeekend) {
+                continue;
+            }
+
             long attended = lesson.getBookings().stream()
                     .filter(b -> b.getStatus() == BookingStatus.ATTENDED)
                     .count();

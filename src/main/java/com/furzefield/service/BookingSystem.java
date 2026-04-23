@@ -82,6 +82,10 @@ public class BookingSystem {
     public Booking changeBooking(Member member, Lesson oldLesson, Lesson newLesson) {
         Booking existingBooking = findBookingOrThrow(member, oldLesson);
 
+        if (existingBooking.getStatus() == BookingStatus.CANCELLED) {
+            throw new IllegalStateException("Cannot change a cancelled booking.");
+        }
+
         if (newLesson.isFull()) {
             throw new IllegalStateException("New lesson is full.");
         }
@@ -116,7 +120,7 @@ public class BookingSystem {
         booking.markCancelled();
         lesson.removeBooking(booking);
         member.removeBooking(booking);
-        allBookings.remove(booking);
+        // Booking is kept in allBookings with CANCELLED status so its ID is never reused
     }
 
     // ── REVIEWS ───────────────────────────────────────────────────────────────
@@ -170,7 +174,7 @@ public class BookingSystem {
 
     // ── REPORT 1: Members per lesson + average rating ─────────────────────────
 
-    public void printAttendanceReport() { reportService.printAttendanceReport();}
+    public void printAttendanceReport(int month) { reportService.printAttendanceReport(month); }
 
     // ── REPORT 2: Highest income exercise type ────────────────────────────────
 

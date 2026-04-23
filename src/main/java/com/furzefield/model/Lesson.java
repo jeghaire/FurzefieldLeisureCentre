@@ -8,6 +8,10 @@ import com.furzefield.enums.TimeSlot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Mavi
+ */
 public class Lesson {
 
     public static final int MAX_CAPACITY = 4;

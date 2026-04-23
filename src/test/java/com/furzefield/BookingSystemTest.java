@@ -13,10 +13,13 @@ import com.furzefield.service.Timetable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.MethodOrderer;
 
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestMethodOrder(MethodOrderer.DisplayName.class)
 public class BookingSystemTest {
 
     private BookingSystem bookingSystem;
@@ -75,6 +78,12 @@ public class BookingSystemTest {
                 "Should throw on time conflict");
     }
 
+    @Test
+    @DisplayName("1d. Max capacity is 4")
+    void testMaxCapacityIsFour() {
+        assertEquals(4, Lesson.MAX_CAPACITY);
+    }
+
     // ── 2. Change booking ─────────────────────────────────────────────────────
 
     @Test
@@ -130,7 +139,7 @@ public class BookingSystemTest {
     // ── 3. Cancel booking ─────────────────────────────────────────────────────
 
     @Test
-    @DisplayName("3a. Cancel booking removes it from lesson, member, and all bookings")
+    @DisplayName("3a. Cancel booking removes it from lesson and member, retains it in system with CANCELLED status")
     void testCancelBookingSuccess() {
         Member member = members.getFirst();
         Lesson lesson = timetable.getAllLessons().getFirst();
@@ -138,9 +147,11 @@ public class BookingSystemTest {
         bookingSystem.bookLesson(member, lesson);
         bookingSystem.cancelBooking(member, lesson);
 
-        assertEquals(0, lesson.getBookings().size(), "Lesson should have no bookings");
-        assertEquals(0, member.getBookings().size(), "Member should have no bookings");
-        assertEquals(0, bookingSystem.getAllBookings().size(), "System should have no bookings");
+        assertEquals(0, lesson.getBookings().size(), "Lesson should have no active bookings");
+        assertEquals(0, member.getBookings().size(), "Member should have no active bookings");
+        assertEquals(1, bookingSystem.getAllBookings().size(), "Cancelled booking should be retained in system");
+        assertEquals(BookingStatus.CANCELLED, bookingSystem.getAllBookings().getFirst().getStatus(),
+                "Booking should be marked CANCELLED");
     }
 
     @Test
@@ -227,9 +238,9 @@ public class BookingSystemTest {
         bookingSystem.bookLesson(member, lesson);
         bookingSystem.cancelBooking(member, lesson);
 
-        // cancelBooking removes the booking from allBookings entirely,
-        // so attendLesson throws IllegalArgumentException (not found)
-        assertThrows(IllegalArgumentException.class,
+        // Cancelled bookings are retained in allBookings, so the booking is found
+        // but rejected by the CANCELLED status check
+        assertThrows(IllegalStateException.class,
                 () -> bookingSystem.attendLesson(member, lesson, 4, "Too late"));
     }
 

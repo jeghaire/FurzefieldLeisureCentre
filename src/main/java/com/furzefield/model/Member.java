@@ -7,6 +7,10 @@ import com.furzefield.enums.TimeSlot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Mavi
+ */
 public class Member {
     private final int id;
     private final String name;
@@ -52,6 +56,6 @@ public class Member {
 
     @Override
     public String toString() {
-        return "Member #" + id + " - " + name + " (" + email + ")";
+        return "Member #" + id + " - " + name + " (" + getEmail() + ")";
     }
 }
