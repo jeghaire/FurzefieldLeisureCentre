@@ -82,6 +82,9 @@ public class BookingSystem {
     public Booking changeBooking(Member member, Lesson oldLesson, Lesson newLesson) {
         Booking existingBooking = findBookingOrThrow(member, oldLesson);
 
+        if (existingBooking.getStatus() == BookingStatus.ATTENDED) {
+            throw new IllegalStateException("Cannot change a booking that has already been attended.");
+        }
         if (existingBooking.getStatus() == BookingStatus.CANCELLED) {
             throw new IllegalStateException("Cannot change a cancelled booking.");
         }

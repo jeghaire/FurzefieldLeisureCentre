@@ -305,7 +305,7 @@ public class Main {
             if (choice == 0)
                 return null;
 
-            List<Lesson> lessons = new ArrayList<>();
+            List<Lesson> lessons;
 
             if (choice == 1) {
                 System.out.println("1. Saturday  2. Sunday");

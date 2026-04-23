@@ -136,6 +136,36 @@ public class BookingSystemTest {
                 "Should throw when no booking exists to change");
     }
 
+    @Test
+    @DisplayName("2d. Change booking fails when booking has already been attended")
+    void testChangeBookingFailsWhenAlreadyAttended() {
+        Member member = members.getFirst();
+        Lesson oldLesson = timetable.getAllLessons().get(0);
+        Lesson newLesson = timetable.getAllLessons().get(1);
+
+        bookingSystem.bookLesson(member, oldLesson);
+        bookingSystem.attendLesson(member, oldLesson, 5, "Great!");
+
+        assertThrows(IllegalStateException.class,
+                () -> bookingSystem.changeBooking(member, oldLesson, newLesson),
+                "Should throw when attempting to change an attended booking");
+    }
+
+    @Test
+    @DisplayName("2e. Change booking fails when booking has been cancelled")
+    void testChangeBookingFailsWhenCancelled() {
+        Member member = members.getFirst();
+        Lesson oldLesson = timetable.getAllLessons().get(0);
+        Lesson newLesson = timetable.getAllLessons().get(1);
+
+        bookingSystem.bookLesson(member, oldLesson);
+        bookingSystem.cancelBooking(member, oldLesson);
+
+        assertThrows(IllegalStateException.class,
+                () -> bookingSystem.changeBooking(member, oldLesson, newLesson),
+                "Should throw when attempting to change a cancelled booking");
+    }
+
     // ── 3. Cancel booking ─────────────────────────────────────────────────────
 
     @Test
