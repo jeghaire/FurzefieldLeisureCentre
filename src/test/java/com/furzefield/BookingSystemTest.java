@@ -165,6 +165,20 @@ public class BookingSystemTest {
                 "Should throw when no booking exists to cancel");
     }
 
+    @Test
+    @DisplayName("3c. Cancel booking fails when booking has already been attended")
+    void testCancelBookingFailsWhenAlreadyAttended() {
+        Member member = members.getFirst();
+        Lesson lesson = timetable.getAllLessons().getFirst();
+
+        bookingSystem.bookLesson(member, lesson);
+        bookingSystem.attendLesson(member, lesson, 5, "Great class!");
+
+        assertThrows(IllegalStateException.class,
+                () -> bookingSystem.cancelBooking(member, lesson),
+                "Should throw when attempting to cancel an attended booking");
+    }
+
     // ── 4. Attend lesson & reviews ────────────────────────────────────────────
 
     @Test

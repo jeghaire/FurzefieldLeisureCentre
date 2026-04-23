@@ -117,6 +117,10 @@ public class BookingSystem {
     public void cancelBooking(Member member, Lesson lesson) {
         Booking booking = findBookingOrThrow(member, lesson);
 
+        if (booking.getStatus() == BookingStatus.ATTENDED) {
+            throw new IllegalStateException("Cannot cancel a booking that has already been attended.");
+        }
+
         booking.markCancelled();
         lesson.removeBooking(booking);
         member.removeBooking(booking);

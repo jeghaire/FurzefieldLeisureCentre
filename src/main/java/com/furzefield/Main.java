@@ -34,7 +34,7 @@ public class Main {
         DataSetup.createSeedBookings(bookingSystem, members, timetable);
         DataSetup.createSeedReviews(bookingSystem, members, timetable);
 
-        System.out.println("──── FurzeField Leisure Centre System ────");
+        System.out.println("\n\n──── Furzefield Leisure Centre System ────");
         boolean running = true;
         while (running) {
             printMenu();
@@ -60,9 +60,7 @@ public class Main {
     // ── MENU ─────────────────────────────────────────────────────────────────
 
     private static void printMenu() {
-        System.out.println("\n──────────────────────────────────────");
-        System.out.println("  MAIN MENU");
-        System.out.println("──────────────────────────────────────");
+        System.out.println("\n──── Main Menu ────");
         System.out.println("  1. View timetable by day");
         System.out.println("  2. View timetable by exercise");
         System.out.println("  3. Book a lesson");
@@ -73,7 +71,6 @@ public class Main {
         System.out.println("  8. Report: Attendance & ratings");
         System.out.println("  9. Report: Income by exercise");
         System.out.println("  0. Exit");
-        System.out.println("──────────────────────────────────────");
     }
 
     // ── OPTION 1: View timetable by day ──────────────────────────────────────
@@ -304,7 +301,7 @@ public class Main {
         System.out.println("\n── Select Lesson ──");
         while (true) {
             System.out.println("Search by: 1. Day   2. Exercise name   3. Enter lesson ID directly");
-            int choice = readIntCanCancel("Choice: ");
+            int choice = readIntCanCancel("Select option: ");
             if (choice == 0)
                 return null;
 
@@ -313,7 +310,7 @@ public class Main {
             if (choice == 1) {
                 System.out.println("1. Saturday  2. Sunday");
                 while (true) {
-                    int day = readIntCanCancel("Select: ");
+                    int day = readIntCanCancel("Select option: ");
                     if (day == 0)
                         return null;
                     if (day == 1 || day == 2) {
@@ -375,7 +372,7 @@ public class Main {
     }
 
     private static int readInt() {
-        System.out.print("Enter choice: ");
+        System.out.print("Select option: ");
         while (!scanner.hasNextInt()) {
             scanner.next();
             System.out.print("Please enter a number: ");

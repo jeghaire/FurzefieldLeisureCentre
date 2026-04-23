@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="FurzefieldLeisureCentre:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/FurzefieldLeisureCentre_jar</output-path>
+    <root id="archive" name="FurzefieldLeisureCentre.jar">
+      <element id="module-output" name="FurzefieldLeisureCentre" />
+    </root>
+  </artifact>
+</component>

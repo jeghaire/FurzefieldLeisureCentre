@@ -18,9 +18,10 @@ public class ReportService {
 
     public void printAttendanceReport(int month) {
         int firstWeekend = (month == 1) ? 1 : 5;
-        int lastWeekend  = (month == 1) ? 4 : 8;
+        int lastWeekend = (month == 1) ? 4 : 8;
 
-        System.out.println("\n══ Attendance & Rating Report — Month " + month + " (Weekends " + firstWeekend + "–" + lastWeekend + ") ══");
+        System.out.println("\n──── Attendance & Rating Report — Month " + month + " (Weekends " + firstWeekend + "–"
+                + lastWeekend + ") ────");
         System.out.printf("%-6s | %-11s | %-9s | %-9s | %-8s | %-10s%n",
                 "ID", "Exercise", "Day", "Time", "Attended", "Avg Rating");
         System.out.println("-".repeat(70));
@@ -48,7 +49,7 @@ public class ReportService {
     }
 
     public void printIncomeReport() {
-        System.out.println("\n══ Income Report ══");
+        System.out.println("\n──── Income Report ────");
         System.out.printf("%-5s | %-11s | %-10s%n", "Rank", "Exercise", "Income");
         System.out.println("-".repeat(35));
 
