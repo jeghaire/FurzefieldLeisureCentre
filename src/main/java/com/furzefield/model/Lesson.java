@@ -1,5 +1,6 @@
 package com.furzefield.model;
 
+import com.furzefield.enums.BookingStatus;
 import com.furzefield.enums.Day;
 import com.furzefield.enums.ExerciseType;
 import com.furzefield.enums.TimeSlot;
@@ -60,7 +61,10 @@ public class Lesson {
     }
 
     public double getTotalIncome() {
-        return exerciseType.getPrice() * bookings.size();
+        long attendedCount = bookings.stream()
+                .filter(b -> b.getStatus() == BookingStatus.ATTENDED)
+                .count();
+        return attendedCount * exerciseType.getPrice();
     }
 
     @Override

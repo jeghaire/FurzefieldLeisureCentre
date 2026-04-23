@@ -103,26 +103,26 @@ public class DataSetup {
                                          Timetable timetable) {
         List<Lesson> lessons = timetable.getAllLessons();
 
-        bookingSystem.submitReview(members.get(0), lessons.get(0), 5, "Amazing Yoga session!");
-        bookingSystem.submitReview(members.get(1), lessons.get(0), 4, "Really enjoyed it.");
-        bookingSystem.submitReview(members.get(2), lessons.get(0), 3, "It was okay.");
-        bookingSystem.submitReview(members.get(3), lessons.get(1), 5, "Best Zumba ever!");
-        bookingSystem.submitReview(members.get(4), lessons.get(1), 4, "Great energy in class.");
-        bookingSystem.submitReview(members.get(5), lessons.get(2), 2, "Too slow for me.");
-        bookingSystem.submitReview(members.get(6), lessons.get(2), 4, "Good workout.");
-        bookingSystem.submitReview(members.get(7), lessons.get(2), 5, "Loved the Aquacise class!");
-        bookingSystem.submitReview(members.get(8), lessons.get(3), 5, "Box Fit was intense!");
-        bookingSystem.submitReview(members.get(9), lessons.get(3), 4, "Really challenging, loved it.");
-        bookingSystem.submitReview(members.get(0), lessons.get(3), 3, "Good but very tough.");
-        bookingSystem.submitReview(members.get(1), lessons.get(4), 4, "Body Blitz was great.");
-        bookingSystem.submitReview(members.get(2), lessons.get(4), 5, "Fantastic class!");
-        bookingSystem.submitReview(members.get(3), lessons.get(6), 4, "Zumba is always fun.");
-        bookingSystem.submitReview(members.get(4), lessons.get(6), 5, "Instructor was brilliant.");
-        bookingSystem.submitReview(members.get(5), lessons.get(6), 3, "Decent session.");
-        bookingSystem.submitReview(members.get(6), lessons.get(6), 4, "Will come back.");
-        bookingSystem.submitReview(members.get(7), lessons.get(7), 2, "A bit too easy.");
-        bookingSystem.submitReview(members.get(8), lessons.get(7), 5, "Perfect pace for me.");
-        bookingSystem.submitReview(members.get(9), lessons.get(9), 4, "Body Blitz well structured.");
-        bookingSystem.submitReview(members.get(0), lessons.get(9), 5, "Incredible session!");
+        bookingSystem.attendLesson(members.get(0), lessons.get(0), 5, "Amazing Yoga session!");
+        bookingSystem.attendLesson(members.get(1), lessons.get(0), 4, "Really enjoyed it.");
+        bookingSystem.attendLesson(members.get(2), lessons.get(0), 3, "It was okay.");
+        bookingSystem.attendLesson(members.get(3), lessons.get(1), 5, "Best Zumba ever!");
+        bookingSystem.attendLesson(members.get(4), lessons.get(1), 4, "Great energy in class.");
+        bookingSystem.attendLesson(members.get(5), lessons.get(2), 2, "Too slow for me.");
+        bookingSystem.attendLesson(members.get(6), lessons.get(2), 4, "Good workout.");
+        bookingSystem.attendLesson(members.get(7), lessons.get(2), 5, "Loved the Aquacise class!");
+        bookingSystem.attendLesson(members.get(8), lessons.get(3), 5, "Box Fit was intense!");
+        bookingSystem.attendLesson(members.get(9), lessons.get(3), 4, "Really challenging, loved it.");
+        bookingSystem.attendLesson(members.get(0), lessons.get(3), 3, "Good but very tough.");
+        bookingSystem.attendLesson(members.get(1), lessons.get(4), 4, "Body Blitz was great.");
+        bookingSystem.attendLesson(members.get(2), lessons.get(4), 5, "Fantastic class!");
+        bookingSystem.attendLesson(members.get(3), lessons.get(6), 4, "Zumba is always fun.");
+        bookingSystem.attendLesson(members.get(4), lessons.get(6), 5, "Instructor was brilliant.");
+        bookingSystem.attendLesson(members.get(5), lessons.get(6), 3, "Decent session.");
+        bookingSystem.attendLesson(members.get(6), lessons.get(6), 4, "Will come back.");
+        bookingSystem.attendLesson(members.get(7), lessons.get(7), 2, "A bit too easy.");
+        bookingSystem.attendLesson(members.get(8), lessons.get(7), 5, "Perfect pace for me.");
+        bookingSystem.attendLesson(members.get(9), lessons.get(9), 4, "Body Blitz well structured.");
+        bookingSystem.attendLesson(members.get(0), lessons.get(9), 5, "Incredible session!");
     }
 }

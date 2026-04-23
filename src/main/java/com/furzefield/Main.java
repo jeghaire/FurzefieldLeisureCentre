@@ -34,7 +34,7 @@ public class Main {
         DataSetup.createSeedReviews(bookingSystem, members, timetable);
 
         System.out.println("========================================");
-        System.out.println("Furzefield Leisure Centre System");
+        System.out.println("FurzeField Leisure Centre System");
         System.out.println("========================================");
 
         boolean running = true;
@@ -47,7 +47,7 @@ public class Main {
                 case 3 -> bookLesson();
                 case 4 -> changeBooking();
                 case 5 -> cancelBooking();
-                case 6 -> submitReview();
+                case 6 -> attendLesson();
                 case 7 -> viewAllBookings();
                 case 8 -> bookingSystem.printAttendanceReport();
                 case 9 -> bookingSystem.printIncomeReport();
@@ -70,10 +70,10 @@ public class Main {
         System.out.println("  3. Book a lesson");
         System.out.println("  4. Change a booking");
         System.out.println("  5. Cancel a booking");
-        System.out.println("  6. Submit a review");
+        System.out.println("  6. Attend lesson & submit a review");
         System.out.println("  7. View all bookings");
-        System.out.println("  8. Report: Attendance & Ratings");
-        System.out.println("  9. Report: Income by Exercise");
+        System.out.println("  8. Report: Attendance & ratings");
+        System.out.println("  9. Report: Income by exercise");
         System.out.println("  0. Exit");
         System.out.println("──────────────────────────────────────");
     }
@@ -162,9 +162,9 @@ public class Main {
         }
     }
 
-    // ── OPTION 6: Submit a review ─────────────────────────────────────────────
+    // ── OPTION 6: Attend a lesson and submit a review ─────────────────────────────────────────────
 
-    private static void submitReview() {
+    private static void attendLesson() {
         Member member = selectMember();
         if (member == null) return;
 
@@ -177,7 +177,7 @@ public class Main {
         if (comment == null) return;
 
         try {
-            Review review = bookingSystem.submitReview(member, lesson, rating, comment);
+            Review review = bookingSystem.attendLesson(member, lesson, rating, comment);
             System.out.println("Review submitted: " + review);
         } catch (IllegalStateException | IllegalArgumentException e) {
             System.out.println("Review failed: " + e.getMessage());

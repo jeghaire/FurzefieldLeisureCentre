@@ -1,5 +1,6 @@
 package com.furzefield.model;
 
+import com.furzefield.enums.BookingStatus;
 import com.furzefield.enums.Day;
 import com.furzefield.enums.TimeSlot;
 
@@ -39,10 +40,10 @@ public class Member {
      */
     public boolean hasTimeConflict(Day day, TimeSlot timeSlot, int weekendNumber) {
         for (Booking b : bookings) {
-            Lesson lesson = b.lesson();
-            if (lesson.getWeekendNumber() == weekendNumber
-                    && lesson.getDay() == day
-                    && lesson.getTimeSlot() == timeSlot) {
+            if (b.getStatus() == BookingStatus.CANCELLED) continue;
+            Lesson l = b.getLesson();
+            if (l.getDay() == day && l.getTimeSlot() == timeSlot
+                    && l.getWeekendNumber() == weekendNumber) {
                 return true;
             }
         }

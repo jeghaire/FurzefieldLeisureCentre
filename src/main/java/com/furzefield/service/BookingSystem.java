@@ -1,5 +1,6 @@
 package com.furzefield.service;
 
+import com.furzefield.enums.BookingStatus;
 import com.furzefield.enums.ExerciseType;
 import com.furzefield.model.Booking;
 import com.furzefield.model.Lesson;
@@ -24,15 +25,18 @@ public class BookingSystem {
     private final List<Member> members;
     private final List<Booking> allBookings;
     private final List<Review> allReviews;
+    private final ReportService reportService;
+    private int bookingCounter = 1;
 
     // ── Singleton ─────────────────────────────────────────────────────────────────
     private static BookingSystem instance;
 
     private BookingSystem(Timetable timetable, List<Member> members) {
-        this.timetable    = timetable;
-        this.members      = members;
-        this.allBookings  = new ArrayList<>();
-        this.allReviews   = new ArrayList<>();
+        this.timetable = timetable;
+        this.members = members;
+        this.reportService = new ReportService(timetable);
+        this.allBookings = new ArrayList<>();
+        this.allReviews = new ArrayList<>();
     }
 
     public static BookingSystem getInstance(Timetable timetable, List<Member> members) {
@@ -42,7 +46,9 @@ public class BookingSystem {
         return instance;
     }
 
-    /** Used in JUnit tests to reset state between tests. */
+    /**
+     * Used in JUnit tests to reset state between tests.
+     */
     public static void resetInstance() {
         instance = null;
     }
@@ -63,7 +69,8 @@ public class BookingSystem {
                             + " (Weekend " + lesson.getWeekendNumber() + ").");
         }
 
-        Booking booking = new Booking(member, lesson);
+        String bookingId = String.format("B%03d", bookingCounter++);
+        Booking booking = new Booking(bookingId, member, lesson);
         lesson.addBooking(booking);
         member.addBooking(booking);
         allBookings.add(booking);
@@ -75,20 +82,30 @@ public class BookingSystem {
     public Booking changeBooking(Member member, Lesson oldLesson, Lesson newLesson) {
         Booking existingBooking = findBookingOrThrow(member, oldLesson);
 
-        // Temporarily remove old booking so conflict check works correctly
+        if (newLesson.isFull()) {
+            throw new IllegalStateException("New lesson is full.");
+        }
+
+        // Remove from old lesson but keep the booking object
         oldLesson.removeBooking(existingBooking);
         member.removeBooking(existingBooking);
-        allBookings.remove(existingBooking);
 
-        try {
-            return bookLesson(member, newLesson);
-        } catch (IllegalStateException e) {
+        // Check time conflict on new lesson
+        if (member.hasTimeConflict(newLesson.getDay(), newLesson.getTimeSlot(), newLesson.getWeekendNumber())) {
             // Rollback
             oldLesson.addBooking(existingBooking);
             member.addBooking(existingBooking);
-            allBookings.add(existingBooking);
-            throw new IllegalStateException("Change failed — original booking restored. Reason: " + e.getMessage());
+            throw new IllegalStateException("Time conflict with new lesson.");
         }
+
+        // Update lesson reference in-place — same booking ID kept
+        existingBooking.changeLesson(newLesson);
+        existingBooking.markChanged();
+
+        newLesson.addBooking(existingBooking);
+        member.addBooking(existingBooking);
+
+        return existingBooking;
     }
 
     // ── CANCEL BOOKING ────────────────────────────────────────────────────────
@@ -96,6 +113,7 @@ public class BookingSystem {
     public void cancelBooking(Member member, Lesson lesson) {
         Booking booking = findBookingOrThrow(member, lesson);
 
+        booking.markCancelled();
         lesson.removeBooking(booking);
         member.removeBooking(booking);
         allBookings.remove(booking);
@@ -103,20 +121,24 @@ public class BookingSystem {
 
     // ── REVIEWS ───────────────────────────────────────────────────────────────
 
-    public Review submitReview(Member member, Lesson lesson, int rating, String comment) {
+    public Review attendLesson(Member member, Lesson lesson, int rating, String comment) {
         if (rating < 1 || rating > 5) {
-            throw new IllegalArgumentException("Rating must be between 1 and 5, got: " + rating);
+            throw new IllegalArgumentException("Rating must be between 1 and 5.");
         }
 
-        // Check the member actually booked this lesson
-        if (findBooking(member, lesson) == null) {
-            throw new IllegalStateException(
-                    member.getName() + " has no booking for this lesson and cannot review it.");
+        Booking booking = findBookingOrThrow(member, lesson);
+
+        if (booking.getStatus() == BookingStatus.CANCELLED) {
+            throw new IllegalStateException("Cannot attend a cancelled lesson.");
+        }
+        if (booking.getStatus() == BookingStatus.ATTENDED) {
+            throw new IllegalStateException("Member has already attended this lesson.");
         }
 
+        booking.markAttended();
         Review review = new Review(member, lesson, rating, comment);
-        allReviews.add(review);
         lesson.addReview(review);
+        allReviews.add(review);
         return review;
     }
 
@@ -148,63 +170,17 @@ public class BookingSystem {
 
     // ── REPORT 1: Members per lesson + average rating ─────────────────────────
 
-    public void printAttendanceReport() {
-        System.out.println("\n========================================");
-        System.out.println("  REPORT 1: Attendance & Ratings");
-        System.out.println("========================================");
-
-        for (Lesson lesson : timetable.getAllLessons()) {
-            int memberCount = lesson.getBookings().size();
-
-            String avgRating = lesson.getReviews().isEmpty()
-                    ? "No reviews"
-                    : String.format("%.1f", lesson.getAverageRating());
-
-            System.out.println("Weekend " + lesson.getWeekendNumber()
-                    + " | " + lesson.getDay()
-                    + " " + lesson.getTimeSlot()
-                    + " | " + lesson.getExerciseType().getDisplayName()
-                    + " | Members: " + memberCount
-                    + " | Avg Rating: " + avgRating);
-        }
-    }
+    public void printAttendanceReport() { reportService.printAttendanceReport();}
 
     // ── REPORT 2: Highest income exercise type ────────────────────────────────
 
-    public void printIncomeReport() {
-        System.out.println("\n========================================");
-        System.out.println("  REPORT 2: Income by Exercise Type");
-        System.out.println("========================================");
-
-        // Get all unique lesson type names
-        ExerciseType topExercise = null;
-        double topIncome = 0;
-
-        for (ExerciseType type : ExerciseType.values()) {
-            double income = 0;
-            for (Lesson l : timetable.getAllLessons()) {
-                if (l.getExerciseType() == type) {
-                    income += l.getTotalIncome();
-                }
-            }
-            System.out.println(type.getDisplayName() + ": £" + String.format("%.2f", income));
-
-            if (income > topIncome) {
-                topIncome = income;
-                topExercise = type;
-            }
-        }
-
-        System.out.println("\nHighest income: "
-                + (topExercise != null ? topExercise.getDisplayName() : "None")
-                + " (£" + String.format("%.2f", topIncome) + ")");
-    }
+    public void printIncomeReport() { reportService.printIncomeReport();}
 
     // ── HELPERS ───────────────────────────────────────────────────────────────
 
     private Booking findBooking(Member member, Lesson lesson) {
         for (Booking b : allBookings) {
-            if (b.member().equals(member) && b.lesson().equals(lesson)) {
+            if (b.getMember().equals(member) && b.getLesson().equals(lesson)) {
                 return b;
             }
         }

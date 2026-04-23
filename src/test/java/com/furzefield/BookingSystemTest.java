@@ -1,6 +1,7 @@
 package com.furzefield;
 
 import com.furzefield.data.DataSetup;
+import com.furzefield.enums.BookingStatus;
 import com.furzefield.enums.Day;
 import com.furzefield.enums.ExerciseType;
 import com.furzefield.model.Booking;
@@ -38,8 +39,8 @@ public class BookingSystemTest {
     @Test
     @DisplayName("1a. Book a lesson successfully")
     void testBookLessonSuccess() {
-        Member member = members.get(0);
-        Lesson lesson = timetable.getAllLessons().get(0);
+        Member member = members.getFirst();
+        Lesson lesson = timetable.getAllLessons().getFirst();
 
         Booking booking = bookingSystem.bookLesson(member, lesson);
 
@@ -50,7 +51,7 @@ public class BookingSystemTest {
     @Test
     @DisplayName("1b. Booking fails when lesson is full")
     void testBookLessonFailsWhenFull() {
-        Lesson lesson = timetable.getAllLessons().get(0);
+        Lesson lesson = timetable.getAllLessons().getFirst();
 
         bookingSystem.bookLesson(members.get(0), lesson);
         bookingSystem.bookLesson(members.get(1), lesson);
@@ -65,8 +66,8 @@ public class BookingSystemTest {
     @Test
     @DisplayName("1c. Booking fails when time conflict exists")
     void testBookLessonFailsOnTimeConflict() {
-        Member member = members.get(0);
-        Lesson lesson = timetable.getAllLessons().get(0);
+        Member member = members.getFirst();
+        Lesson lesson = timetable.getAllLessons().getFirst();
 
         bookingSystem.bookLesson(member, lesson);
 
@@ -86,22 +87,24 @@ public class BookingSystemTest {
     @Test
     @DisplayName("2a. Change booking succeeds")
     void testChangeBookingSuccess() {
-        Member member = members.get(0);
+        Member member = members.getFirst();
         Lesson oldLesson = timetable.getAllLessons().get(0);
         Lesson newLesson = timetable.getAllLessons().get(1);
 
-        bookingSystem.bookLesson(member, oldLesson);
+        String originalId = bookingSystem.bookLesson(member, oldLesson).getBookingId();
         Booking changed = bookingSystem.changeBooking(member, oldLesson, newLesson);
 
         assertNotNull(changed);
+        assertEquals(originalId, changed.getBookingId(), "Booking ID should be preserved on change");
         assertEquals(0, oldLesson.getBookings().size());
         assertEquals(1, newLesson.getBookings().size());
+        assertEquals(BookingStatus.CHANGED, changed.getStatus());
     }
 
     @Test
     @DisplayName("2b. Change booking fails when new lesson is full")
     void testChangeBookingFailsWhenNewLessonFull() {
-        Member member = members.get(0);
+        Member member = members.getFirst();
         Lesson oldLesson = timetable.getAllLessons().get(0);
         Lesson newLesson = timetable.getAllLessons().get(1);
 
@@ -124,8 +127,8 @@ public class BookingSystemTest {
     @Test
     @DisplayName("3a. Cancel booking succeeds")
     void testCancelBookingSuccess() {
-        Member member = members.get(0);
-        Lesson lesson = timetable.getAllLessons().get(0);
+        Member member = members.getFirst();
+        Lesson lesson = timetable.getAllLessons().getFirst();
 
         bookingSystem.bookLesson(member, lesson);
         bookingSystem.cancelBooking(member, lesson);
@@ -133,41 +136,56 @@ public class BookingSystemTest {
         assertEquals(0, lesson.getBookings().size());
     }
 
-    // ── 4. Reviews ────────────────────────────────────────────────────────────
+// ── 4. Attend lesson & reviews ────────────────────────────────────────────
 
     @Test
-    @DisplayName("4a. Submit review succeeds")
-    void testSubmitReviewSuccess() {
-        Member member = members.get(0);
-        Lesson lesson = timetable.getAllLessons().get(0);
+    @DisplayName("4a. Attend lesson and submit review successfully")
+    void testAttendLessonSuccess() {
+        Member member = members.getFirst();
+        Lesson lesson = timetable.getAllLessons().getFirst();
 
         bookingSystem.bookLesson(member, lesson);
-        Review review = bookingSystem.submitReview(member, lesson, 5, "Excellent!");
+        Review review = bookingSystem.attendLesson(member, lesson, 5, "Excellent!");
 
         assertNotNull(review);
         assertEquals(1, bookingSystem.getAllReviews().size());
+        assertEquals(BookingStatus.ATTENDED,
+                bookingSystem.getAllBookings().getFirst().getStatus());
     }
 
     @Test
     @DisplayName("4b. Review fails with invalid rating")
-    void testSubmitReviewFailsWithInvalidRating() {
-        Member member = members.get(0);
-        Lesson lesson = timetable.getAllLessons().get(0);
+    void testAttendLessonFailsWithInvalidRating() {
+        Member member = members.getFirst();
+        Lesson lesson = timetable.getAllLessons().getFirst();
 
         bookingSystem.bookLesson(member, lesson);
 
         assertThrows(IllegalArgumentException.class,
-                () -> bookingSystem.submitReview(member, lesson, 6, "Bad rating"));
+                () -> bookingSystem.attendLesson(member, lesson, 6, "Bad rating"));
     }
 
     @Test
-    @DisplayName("4c. Review fails if member never booked the lesson")
-    void testSubmitReviewFailsIfNotBooked() {
-        Member member = members.get(0);
-        Lesson lesson = timetable.getAllLessons().get(0);
+    @DisplayName("4c. Cannot attend lesson without a booking")
+    void testAttendLessonFailsIfNotBooked() {
+        Member member = members.getFirst();
+        Lesson lesson = timetable.getAllLessons().getFirst();
+
+        assertThrows(IllegalArgumentException.class,
+                () -> bookingSystem.attendLesson(member, lesson, 4, "Never booked"));
+    }
+
+    @Test
+    @DisplayName("4d. Cannot attend the same lesson twice")
+    void testAttendLessonFailsIfAlreadyAttended() {
+        Member member = members.getFirst();
+        Lesson lesson = timetable.getAllLessons().getFirst();
+
+        bookingSystem.bookLesson(member, lesson);
+        bookingSystem.attendLesson(member, lesson, 5, "Great!");
 
         assertThrows(IllegalStateException.class,
-                () -> bookingSystem.submitReview(member, lesson, 4, "Never attended"));
+                () -> bookingSystem.attendLesson(member, lesson, 4, "Again"));
     }
 
     // ── 5. Average rating ─────────────────────────────────────────────────────
@@ -177,12 +195,12 @@ public class BookingSystemTest {
     void testAverageRating() {
         Member member = members.get(0);
         Member member2 = members.get(1);
-        Lesson lesson = timetable.getAllLessons().get(0);
+        Lesson lesson = timetable.getAllLessons().getFirst();
 
         bookingSystem.bookLesson(member, lesson);
         bookingSystem.bookLesson(member2, lesson);
-        bookingSystem.submitReview(member, lesson, 4, "Good");
-        bookingSystem.submitReview(member2, lesson, 2, "Not great");
+        bookingSystem.attendLesson(member, lesson, 4, "Good");
+        bookingSystem.attendLesson(member2, lesson, 2, "Not great");
 
         assertEquals(3.0, lesson.getAverageRating(), 0.001,
                 "Average of 4 and 2 should be 3.0");
@@ -191,7 +209,7 @@ public class BookingSystemTest {
     @Test
     @DisplayName("5b. No reviews returns 0.0 average")
     void testAverageRatingNoReviews() {
-        Lesson lesson = timetable.getAllLessons().get(0);
+        Lesson lesson = timetable.getAllLessons().getFirst();
         assertEquals(0.0, lesson.getAverageRating(), 0.001);
     }
 
@@ -220,10 +238,12 @@ public class BookingSystemTest {
     void testTotalIncome() {
         Member member = members.get(0);
         Member member2 = members.get(1);
-        Lesson lesson = timetable.getAllLessons().get(0);
+        Lesson lesson = timetable.getAllLessons().getFirst();
 
         bookingSystem.bookLesson(member, lesson);
         bookingSystem.bookLesson(member2, lesson);
+        bookingSystem.attendLesson(member, lesson, 5, "Great!");
+        bookingSystem.attendLesson(member2, lesson, 4, "Good!");
 
         // Yoga price = £12.00, 2 members → £24.00
         assertEquals(24.00, lesson.getTotalIncome(), 0.001);
