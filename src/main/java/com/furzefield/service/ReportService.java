@@ -52,40 +52,39 @@ public class ReportService {
 
     public void printIncomeReport() {
         System.out.println("\n──── Income Report ────");
-        System.out.printf("%-5s | %-11s | %-10s%n", "Rank", "Exercise", "Income");
-        System.out.println("-".repeat(35));
+        System.out.printf("%-5s | %-11s | %-10s | %-8s%n", "Rank", "Exercise", "Income", "Attended");
+        System.out.println("-".repeat(47));
 
-        List<double[]> rows = new ArrayList<>();
-        List<ExerciseType> types = new ArrayList<>();
-        for (ExerciseType type : ExerciseType.values()) {
-            double income = timetable.getAllLessons().stream()
-                    .filter(l -> l.getExerciseType() == type)
-                    .mapToDouble(Lesson::getTotalIncome)
-                    .sum();
-            rows.add(new double[] { income });
-            types.add(type);
+        ExerciseType[] types = ExerciseType.values();
+        double[] incomes = new double[types.length];
+        long[] attendances = new long[types.length];
+
+        for (int i = 0; i < types.length; i++) {
+            for (Lesson l : timetable.getAllLessons()) {
+                if (l.getExerciseType() != types[i]) continue;
+                incomes[i] += l.getTotalIncome();
+                attendances[i] += l.getBookings().stream()
+                        .filter(b -> b.getStatus() == BookingStatus.ATTENDED)
+                        .count();
+            }
         }
 
-        // Sort descending by income
         List<Integer> order = new ArrayList<>();
-        for (int i = 0; i < types.size(); i++)
-            order.add(i);
-        order.sort((a, b) -> Double.compare(rows.get(b)[0], rows.get(a)[0]));
+        for (int i = 0; i < types.length; i++) order.add(i);
+        order.sort((a, b) -> Double.compare(incomes[b], incomes[a]));
 
         int rank = 1;
         for (int i = 0; i < order.size(); i++) {
-            if (i > 0 && rows.get(order.get(i))[0] < rows.get(order.get(i - 1))[0]) {
-                rank = i + 1;
-            }
-            System.out.printf("%-5d | %-11s | £%-9.2f%n",
-                    rank, types.get(order.get(i)).getDisplayName(), rows.get(order.get(i))[0]);
+            if (i > 0 && incomes[order.get(i)] < incomes[order.get(i - 1)]) rank = i + 1;
+            System.out.printf("%-5d | %-11s | £%-9.2f | %-8d%n",
+                    rank, types[order.get(i)].getDisplayName(),
+                    incomes[order.get(i)], attendances[order.get(i)]);
         }
 
-        System.out.println("-".repeat(35));
+        System.out.println("-".repeat(47));
         if (!order.isEmpty()) {
-            double topIncome = rows.get(order.getFirst())[0];
-            System.out.println("Highest: " + types.get(order.getFirst()).getDisplayName()
-                    + " (£" + String.format("%.2f", topIncome) + ")");
+            System.out.println("Highest: " + types[order.getFirst()].getDisplayName()
+                    + " (£" + String.format("%.2f", incomes[order.getFirst()]) + ")");
         }
     }
 }
