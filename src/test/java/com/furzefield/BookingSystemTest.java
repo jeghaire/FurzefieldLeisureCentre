@@ -13,13 +13,10 @@ import com.furzefield.service.Timetable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.MethodOrderer;
 
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
-@TestMethodOrder(MethodOrderer.DisplayName.class)
 public class BookingSystemTest {
 
     private BookingSystem bookingSystem;
@@ -64,22 +61,18 @@ public class BookingSystemTest {
     }
 
     @Test
-    @DisplayName("1c. Booking fails when time conflict exists")
+    @DisplayName("1c. Booking fails when member already has a booking at that time slot")
     void testBookLessonFailsOnTimeConflict() {
         Member member = members.getFirst();
         Lesson lesson = timetable.getAllLessons().getFirst();
 
         bookingSystem.bookLesson(member, lesson);
 
+        // Booking the same lesson again hits the time-conflict check
+        // (same weekend, day, and time slot already occupied)
         assertThrows(IllegalStateException.class,
                 () -> bookingSystem.bookLesson(member, lesson),
                 "Should throw on time conflict");
-    }
-
-    @Test
-    @DisplayName("1d. Max capacity is 4")
-    void testMaxCapacityIsFour() {
-        assertEquals(4, Lesson.MAX_CAPACITY);
     }
 
     // ── 2. Change booking ─────────────────────────────────────────────────────
@@ -122,10 +115,22 @@ public class BookingSystemTest {
                 "Original booking should be restored after failed change");
     }
 
+    @Test
+    @DisplayName("2c. Change booking fails when no booking exists for that member and lesson")
+    void testChangeBookingFailsWhenNoBookingExists() {
+        Member member = members.getFirst();
+        Lesson oldLesson = timetable.getAllLessons().get(0);
+        Lesson newLesson = timetable.getAllLessons().get(1);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> bookingSystem.changeBooking(member, oldLesson, newLesson),
+                "Should throw when no booking exists to change");
+    }
+
     // ── 3. Cancel booking ─────────────────────────────────────────────────────
 
     @Test
-    @DisplayName("3a. Cancel booking succeeds")
+    @DisplayName("3a. Cancel booking removes it from lesson, member, and all bookings")
     void testCancelBookingSuccess() {
         Member member = members.getFirst();
         Lesson lesson = timetable.getAllLessons().getFirst();
@@ -133,10 +138,23 @@ public class BookingSystemTest {
         bookingSystem.bookLesson(member, lesson);
         bookingSystem.cancelBooking(member, lesson);
 
-        assertEquals(0, lesson.getBookings().size());
+        assertEquals(0, lesson.getBookings().size(), "Lesson should have no bookings");
+        assertEquals(0, member.getBookings().size(), "Member should have no bookings");
+        assertEquals(0, bookingSystem.getAllBookings().size(), "System should have no bookings");
     }
 
-// ── 4. Attend lesson & reviews ────────────────────────────────────────────
+    @Test
+    @DisplayName("3b. Cancel booking fails when no booking exists for that member and lesson")
+    void testCancelBookingFailsWhenNoBookingExists() {
+        Member member = members.getFirst();
+        Lesson lesson = timetable.getAllLessons().getFirst();
+
+        assertThrows(IllegalArgumentException.class,
+                () -> bookingSystem.cancelBooking(member, lesson),
+                "Should throw when no booking exists to cancel");
+    }
+
+    // ── 4. Attend lesson & reviews ────────────────────────────────────────────
 
     @Test
     @DisplayName("4a. Attend lesson and submit review successfully")
@@ -154,8 +172,8 @@ public class BookingSystemTest {
     }
 
     @Test
-    @DisplayName("4b. Review fails with invalid rating")
-    void testAttendLessonFailsWithInvalidRating() {
+    @DisplayName("4b. Review fails with rating above maximum (6)")
+    void testAttendLessonFailsWithRatingAboveMax() {
         Member member = members.getFirst();
         Lesson lesson = timetable.getAllLessons().getFirst();
 
@@ -166,7 +184,19 @@ public class BookingSystemTest {
     }
 
     @Test
-    @DisplayName("4c. Cannot attend lesson without a booking")
+    @DisplayName("4c. Review fails with rating below minimum (0)")
+    void testAttendLessonFailsWithRatingBelowMin() {
+        Member member = members.getFirst();
+        Lesson lesson = timetable.getAllLessons().getFirst();
+
+        bookingSystem.bookLesson(member, lesson);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> bookingSystem.attendLesson(member, lesson, 0, "Bad rating"));
+    }
+
+    @Test
+    @DisplayName("4d. Cannot attend lesson without a booking")
     void testAttendLessonFailsIfNotBooked() {
         Member member = members.getFirst();
         Lesson lesson = timetable.getAllLessons().getFirst();
@@ -176,7 +206,7 @@ public class BookingSystemTest {
     }
 
     @Test
-    @DisplayName("4d. Cannot attend the same lesson twice")
+    @DisplayName("4e. Cannot attend the same lesson twice")
     void testAttendLessonFailsIfAlreadyAttended() {
         Member member = members.getFirst();
         Lesson lesson = timetable.getAllLessons().getFirst();
@@ -186,6 +216,21 @@ public class BookingSystemTest {
 
         assertThrows(IllegalStateException.class,
                 () -> bookingSystem.attendLesson(member, lesson, 4, "Again"));
+    }
+
+    @Test
+    @DisplayName("4f. Cannot attend after booking has been cancelled")
+    void testAttendLessonFailsAfterCancellation() {
+        Member member = members.getFirst();
+        Lesson lesson = timetable.getAllLessons().getFirst();
+
+        bookingSystem.bookLesson(member, lesson);
+        bookingSystem.cancelBooking(member, lesson);
+
+        // cancelBooking removes the booking from allBookings entirely,
+        // so attendLesson throws IllegalArgumentException (not found)
+        assertThrows(IllegalArgumentException.class,
+                () -> bookingSystem.attendLesson(member, lesson, 4, "Too late"));
     }
 
     // ── 5. Average rating ─────────────────────────────────────────────────────

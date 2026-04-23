@@ -1,6 +1,7 @@
 package com.furzefield;
 
 import com.furzefield.data.DataSetup;
+import com.furzefield.enums.BookingStatus;
 import com.furzefield.enums.Day;
 import com.furzefield.enums.ExerciseType;
 import com.furzefield.model.Booking;
@@ -83,26 +84,34 @@ public class Main {
     private static void viewTimetableByDay() {
         System.out.println("1. Saturday");
         System.out.println("2. Sunday");
-        int choice = readIntCanCancel("Select day: ");
-        if (choice == 0) return;
-        if (choice != 1 && choice != 2) {
+        while (true) {
+            int choice = readIntCanCancel("Select day: ");
+            if (choice == 0) return;
+            if (choice == 1 || choice == 2) {
+                Day day = (choice == 1) ? Day.SATURDAY : Day.SUNDAY;
+                bookingSystem.viewTimetableByDay(day);
+                return;
+            }
             System.out.println("Invalid choice. Please enter 1 or 2.");
-            return;
         }
-        Day day = (choice == 1) ? Day.SATURDAY : Day.SUNDAY;
-        bookingSystem.viewTimetableByDay(day);
     }
 
     // ── OPTION 2: View timetable by exercise ─────────────────────────────────
 
     private static void viewTimetableByExercise() {
-        String name = readStringWithCancel("Enter exercise name (Yoga / Zumba / Aquacise / Box Fit / Body Blitz): ");
-        if (name == null) return;
-        try {
-            ExerciseType type = ExerciseType.fromDisplayName(name);
-            bookingSystem.viewTimetableByExercise(type);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Exercise not found: " + name);
+        ExerciseType[] types = ExerciseType.values();
+        System.out.println("\n── Select Exercise ──");
+        for (int i = 0; i < types.length; i++) {
+            System.out.println((i + 1) + ". " + types[i].getDisplayName());
+        }
+        while (true) {
+            int choice = readIntCanCancel("Select exercise: ");
+            if (choice == 0) return;
+            if (choice >= 1 && choice <= types.length) {
+                bookingSystem.viewTimetableByExercise(types[choice - 1]);
+                return;
+            }
+            System.out.println("Invalid choice. Please enter a number between 1 and " + types.length + ".");
         }
     }
 
@@ -129,8 +138,8 @@ public class Main {
         Member member = selectMember();
         if (member == null) return;
 
-        System.out.println("\nSelect the lesson you want to CHANGE FROM:");
-        Lesson oldLesson = selectLesson();
+        System.out.println("\nSelect the booking you want to CHANGE FROM:");
+        Lesson oldLesson = selectMemberLesson(member);
         if (oldLesson == null) return;
 
         System.out.println("\nSelect the lesson you want to CHANGE TO:");
@@ -151,7 +160,7 @@ public class Main {
         Member member = selectMember();
         if (member == null) return;
 
-        Lesson lesson = selectLesson();
+        Lesson lesson = selectMemberLesson(member);
         if (lesson == null) return;
 
         try {
@@ -168,11 +177,16 @@ public class Main {
         Member member = selectMember();
         if (member == null) return;
 
-        Lesson lesson = selectLesson();
+        Lesson lesson = selectMemberLesson(member);
         if (lesson == null) return;
 
-        int rating = readIntCanCancel("Enter rating (1-5): ");
-        if (rating == 0) return;
+        int rating;
+        while (true) {
+            rating = readIntCanCancel("Enter rating (1-5): ");
+            if (rating == 0) return;
+            if (rating >= 1 && rating <= 5) break;
+            System.out.println("Rating must be between 1 and 5.");
+        }
         String comment = readStringWithCancel("Enter comment: ");
         if (comment == null) return;
 
@@ -193,8 +207,19 @@ public class Main {
             return;
         }
         System.out.println("\n── All Bookings ──");
+        System.out.printf("%-6s | %-20s | %-11s | %-9s | %-8s | %-9s | %-9s%n",
+                "ID", "Member", "Exercise", "Lesson ID", "Day", "Time", "Status");
+        System.out.println("-".repeat(83));
         for (Booking b : bookings) {
-            System.out.println(b);
+            Lesson l = b.getLesson();
+            System.out.printf("%-6s | %-20s | %-11s | %-9s | %-8s | %-9s | %-9s%n",
+                    b.getBookingId(),
+                    b.getMember().getName(),
+                    l.getExerciseType().getDisplayName(),
+                    l.getLessonId(),
+                    l.getDay().getDisplayName(),
+                    l.getTimeSlot().getDisplayName(),
+                    b.getStatus());
         }
     }
 
@@ -205,70 +230,110 @@ public class Main {
         for (Member m : members) {
             System.out.println(m.getId() + ". " + m.getName());
         }
-        int id = readIntCanCancel("Enter member number: ");
-        if (id == 0) return null;
-        for (Member m : members) {
-            if (m.getId() == id) return m;
+        while (true) {
+            int id = readIntCanCancel("Enter member number: ");
+            if (id == 0) return null;
+            for (Member m : members) {
+                if (m.getId() == id) return m;
+            }
+            System.out.println("Member not found. Try again.");
         }
-        System.out.println("Member not found.");
-        return null;
+    }
+
+    private static Lesson selectMemberLesson(Member member) {
+        List<Booking> bookings = new ArrayList<>();
+        for (Booking b : member.getBookings()) {
+            if (b.getStatus() == BookingStatus.BOOKED || b.getStatus() == BookingStatus.CHANGED) {
+                bookings.add(b);
+            }
+        }
+
+        if (bookings.isEmpty()) {
+            System.out.println(member.getName() + " has no active bookings.");
+            return null;
+        }
+
+        System.out.println("\n── " + member.getName() + "'s Bookings ──");
+        for (int i = 0; i < bookings.size(); i++) {
+            System.out.printf("%2d. %s%n", (i + 1), bookings.get(i));
+        }
+
+        while (true) {
+            int index = readIntCanCancel("Select booking number: ");
+            if (index == 0) return null;
+            if (index >= 1 && index <= bookings.size()) {
+                return bookings.get(index - 1).getLesson();
+            }
+            System.out.println("Invalid selection. Please enter a number between 1 and " + bookings.size() + ".");
+        }
     }
 
     private static Lesson selectLesson() {
         System.out.println("\n── Select Lesson ──");
-        System.out.println("Search by: 1. Day   2. Exercise name   3. Enter lesson ID directly");
-        int choice = readIntCanCancel("Choice: ");
-        if (choice == 0) return null;
+        while (true) {
+            System.out.println("Search by: 1. Day   2. Exercise name   3. Enter lesson ID directly");
+            int choice = readIntCanCancel("Choice: ");
+            if (choice == 0) return null;
 
-        List<Lesson> lessons = new ArrayList<>();
+            List<Lesson> lessons = new ArrayList<>();
 
-        if (choice == 1) {
-            System.out.println("1. Saturday  2. Sunday");
-            int day = readIntCanCancel("Select: ");
-            if (day == 0) return null;
-            if (day != 1 && day != 2) {
-                System.out.println("Invalid choice. Please enter 1 or 2.");
-                return null;
+            if (choice == 1) {
+                System.out.println("1. Saturday  2. Sunday");
+                while (true) {
+                    int day = readIntCanCancel("Select: ");
+                    if (day == 0) return null;
+                    if (day == 1 || day == 2) {
+                        Day dayEnum = (day == 1) ? Day.SATURDAY : Day.SUNDAY;
+                        lessons = bookingSystem.getTimetable().getLessonsByDay(dayEnum);
+                        break;
+                    }
+                    System.out.println("Invalid choice. Please enter 1 or 2.");
+                }
+            } else if (choice == 2) {
+                ExerciseType[] types = ExerciseType.values();
+                for (int i = 0; i < types.length; i++) {
+                    System.out.println((i + 1) + ". " + types[i].getDisplayName());
+                }
+                while (true) {
+                    int pick = readIntCanCancel("Select exercise: ");
+                    if (pick == 0) return null;
+                    if (pick >= 1 && pick <= types.length) {
+                        lessons = bookingSystem.getTimetable().getLessonsByExercise(types[pick - 1]);
+                        break;
+                    }
+                    System.out.println("Invalid choice. Please enter a number between 1 and " + types.length + ".");
+                }
+            } else if (choice == 3) {
+                while (true) {
+                    String lessonId = readStringWithCancel("Enter lesson ID (e.g. W1SM): ");
+                    if (lessonId == null) return null;
+                    Lesson lesson = bookingSystem.getTimetable().findById(lessonId);
+                    if (lesson != null) return lesson;
+                    System.out.println("Lesson not found: " + lessonId + ". Try again.");
+                }
+            } else {
+                System.out.println("Invalid choice. Please enter 1, 2, or 3.");
+                continue;
             }
-            Day dayEnum = (day == 1) ? Day.SATURDAY : Day.SUNDAY;
-            lessons = bookingSystem.getTimetable().getLessonsByDay(dayEnum);
-        } else if (choice == 2) {
-            String name = readStringWithCancel("Enter exercise name: ");
-            if (name == null) return null;
-            try {
-                ExerciseType type = ExerciseType.fromDisplayName(name);
-                lessons = bookingSystem.getTimetable().getLessonsByExercise(type);
-            } catch (IllegalArgumentException e) {
-                System.out.println("Exercise not found: " + name);
-                return null;
+
+            if (lessons.isEmpty()) {
+                System.out.println("No lessons found.");
+                continue;
             }
-        } else if (choice == 3) {
-            String lessonId = readStringWithCancel("Enter lesson ID (e.g. W1SM): ");
-            if (lessonId == null) return null;
-            Lesson lesson = bookingSystem.getTimetable().findById(lessonId);
-            if (lesson == null) {
-                System.out.println("Lesson not found: " + lessonId);
-                return null;
+
+            for (int i = 0; i < lessons.size(); i++) {
+                System.out.printf("%2d. %s%n", (i + 1), lessons.get(i));
             }
-            return lesson;
-        }
 
-        if (lessons.isEmpty()) {
-            System.out.println("No lessons found.");
-            return null;
+            while (true) {
+                int index = readIntCanCancel("Select lesson number: ");
+                if (index == 0) return null;
+                if (index >= 1 && index <= lessons.size()) {
+                    return lessons.get(index - 1);
+                }
+                System.out.println("Invalid selection. Please enter a number between 1 and " + lessons.size() + ".");
+            }
         }
-
-        for (int i = 0; i < lessons.size(); i++) {
-            System.out.println((i + 1) + ". " + lessons.get(i));
-        }
-
-        int index = readIntCanCancel("Select lesson number: ");
-        if (index == 0) return null;
-        if (index < 1 || index > lessons.size()) {
-            System.out.println("Invalid selection.");
-            return null;
-        }
-        return lessons.get(index - 1);
     }
 
     private static int readInt() {

@@ -62,7 +62,7 @@ public class ReportService {
 
         System.out.println("-".repeat(35));
         if (topExercise != null) {
-            System.out.println("🏆 Highest: " + topExercise.getDisplayName()
+            System.out.println("Highest: " + topExercise.getDisplayName()
                     + " (£" + String.format("%.2f", topIncome) + ")");
         }
     }
