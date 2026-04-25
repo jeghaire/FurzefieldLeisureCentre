@@ -155,6 +155,12 @@ public class BookingSystem {
 
     // ── TIMETABLE VIEWS ───────────────────────────────────────────────────────
 
+    private static final String LESSON_TABLE_HEADER = String.format(
+            "%-63s | %s%n%-6s | %-7s | %-9s | %-9s | %-11s | %-6s | %s",
+            "", "Available",
+            "ID", "Weekend", "Day", "Time", "Exercise", "Price", "Spaces");
+    private static final String LESSON_TABLE_SEPARATOR = "-".repeat(77);
+
     public void viewTimetableByDay(Day day) {
         System.out.println("\n── Timetable for " + day + " ──");
         List<Lesson> lessons = timetable.getLessonsByDay(day);
@@ -162,6 +168,8 @@ public class BookingSystem {
             System.out.println("No lessons found.");
             return;
         }
+        System.out.println(LESSON_TABLE_HEADER);
+        System.out.println(LESSON_TABLE_SEPARATOR);
         for (Lesson l : lessons) {
             System.out.println(l);
         }
@@ -174,6 +182,8 @@ public class BookingSystem {
             System.out.println("No lessons found.");
             return;
         }
+        System.out.println(LESSON_TABLE_HEADER);
+        System.out.println(LESSON_TABLE_SEPARATOR);
         for (Lesson l : lessons) {
             System.out.println(l);
         }

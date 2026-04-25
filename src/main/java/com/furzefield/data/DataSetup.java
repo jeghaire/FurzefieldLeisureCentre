@@ -18,7 +18,7 @@ public class DataSetup {
 
     public static List<Member> createMembers() {
         List<Member> members = new ArrayList<>();
-        members.add(new Member(1, "Praise Jomavi", "praise.jomavi@flc.com"));
+        members.add(new Member(1, "Alice Johnson", "alice@flc.com"));
         members.add(new Member(2, "Bob Smith", "bob@flc.com"));
         members.add(new Member(3, "Carol White", "carol@flc.com"));
         members.add(new Member(4, "David Brown", "david@flc.com"));
@@ -28,7 +28,7 @@ public class DataSetup {
         members.add(new Member(8, "Harry Moore", "harry@flc.com"));
         members.add(new Member(9, "Isla Martin", "isla@flc.com"));
         members.add(new Member(10, "Jack Thompson", "jack@flc.com"));
-        members.add(new Member(11, "Alice Johnson", "alice@flc.com"));
+        members.add(new Member(11, "Praise Jomavi", "praise.jomavi@flc.com"));
         return members;
     }
 

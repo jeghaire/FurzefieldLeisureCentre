@@ -218,7 +218,7 @@ public class Main {
         System.out.println("\n── All Bookings ──");
         System.out.printf("%-6s | %-20s | %-11s | %-9s | %-8s | %-9s | %-9s%n",
                 "ID", "Member", "Exercise", "Lesson ID", "Day", "Time", "Status");
-        System.out.println("-".repeat(83));
+        System.out.println("-".repeat(90));
         for (Booking b : bookings) {
             Lesson l = b.getLesson();
             System.out.printf("%-6s | %-20s | %-11s | %-9s | %-8s | %-9s | %-9s%n",
@@ -355,6 +355,10 @@ public class Main {
                 continue;
             }
 
+            System.out.printf("%-67s | %s%n", "", "Available");
+            System.out.printf("%2s. %-6s | %-7s | %-9s | %-9s | %-11s | %-6s | %s%n",
+                    "#", "ID", "Weekend", "Day", "Time", "Exercise", "Price", "Spaces");
+            System.out.println("-".repeat(81));
             for (int i = 0; i < lessons.size(); i++) {
                 System.out.printf("%2d. %s%n", (i + 1), lessons.get(i));
             }
